@@ -11,7 +11,10 @@ Please let me know by reaching out to `@GitanElyon` on github, or `arcadetitan` 
 - finish up html
 - get basic css up
 - finish scripting with JS
+- get site background working
+- make it all look good for mobile
 - easter eggs
+- optimizations
 - finish todo later, i gotta take a shit right now
 
 # Actual README
