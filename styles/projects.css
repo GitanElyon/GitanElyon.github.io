@@ -1,0 +1,46 @@
+#project-nav {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    background-color: #282828; /* Change this to your desired background color */
+    padding: 10px 0;
+}
+
+#project-nav a {
+    text-decoration: none;
+    font-size: 1.5em;
+    color: #f9f9f9; /* Change this to your desired text color */
+    padding: 10px;
+}
+
+#project-nav img {
+    width: 75px;
+    /* Adjust the size as needed */
+    height: 75px;
+    /* Adjust the size as needed */
+}
+
+.logo {
+    will-change: filter;
+    transition: 0.50s;
+}
+
+.yawma:hover {
+    filter: drop-shadow(0 0 2em #ff00ff);
+}
+
+.catalyst:hover {
+    filter: drop-shadow(0 0 2em #ff7300);
+}
+
+.geode:hover {
+    filter: drop-shadow(0 0 2em #7300ff);
+}
+
+.agora:hover {
+    filter: drop-shadow(0 0 2em #00d9ff);
+}
+
+.aqueduct:hover {
+    filter: drop-shadow(0 0 2em #2f00ff);
+}

@@ -1,0 +1,92 @@
+footer {
+    background-color: #111111;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    padding: 10px 0;
+}
+
+h1 {
+    font-size: 3em;
+    margin: 0;
+    padding: 0;
+    margin-top: 5%;
+    margin-left: 5%;
+}
+
+h2 {
+    font-size: 2.25em;
+    padding: 0;
+    margin-left: 5%;
+    transform: translateY(-0.9em);
+}
+
+footer {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+}
+
+.vertical-line {
+    width: 3px;
+    height: 150px; /* Adjust the height as needed */
+    background-color: white;
+    margin: 0px 10px; /* Adjusted the margin to make the divider closer */
+
+}
+
+#name {
+    margin-right: -35.5vw
+}
+
+#socials {
+    margin-top: 10%;
+    font-size: 2em;
+    text-align: center; /* Center the logos */
+    margin-left: 0%;
+}
+
+#socials a {
+    margin: 0 7px; /* Add some spacing between the logos */
+}
+
+#name, #contact, #thanks {
+    flex: 1;
+}
+
+#contact h3 {
+    font-size: 2em;
+    margin: 0;
+    padding: 0;
+    margin-left: 5%;
+}
+
+#contact p {
+    font-size: 1em;
+    margin-left: 5%;
+    margin-top: 10px;
+    margin-bottom: 2px;
+}
+
+#thanks {
+    transform: translateX(-15vw);
+}
+
+#thanks h3 {
+    font-size: 2em;
+    margin: 0;
+    padding: 0;
+    margin-left: 5%;
+}
+
+#thanks p {
+    font-size: 1em;
+    margin-left: 5%;
+    margin-top: 10px;
+    margin-bottom: 2px;
+}

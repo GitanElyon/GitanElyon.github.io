@@ -18,4 +18,17 @@ document.addEventListener("DOMContentLoaded", function() {
             iframeDocument.head.appendChild(style);
         };
     });
+
+    document.getElementById('header-arrow').addEventListener('click', function() {
+        document.getElementById('projects-section').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    document.getElementById('projects-arrow').addEventListener('click', function() {
+        document.getElementById('skills-section').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    document.getElementById('skills-arrow').addEventListener('click', function() {
+        document.getElementById('about-section').scrollIntoView({ behavior: 'smooth' });
+    });
+
 });

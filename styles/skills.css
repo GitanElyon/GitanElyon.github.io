@@ -1,0 +1,137 @@
+.skills img {
+    width: 50px;
+    /* Adjust the size as needed */
+    height: 50px;
+    /* Adjust the size as needed */
+}
+
+.logo {
+    height: 6em;
+    will-change: filter;
+    transition: 0.50s;
+}
+
+.java:hover {
+    filter: drop-shadow(0 0 2em #00b3ff);
+}
+
+.python:hover {
+    filter: drop-shadow(0 0 2em #0a6fc2);
+}
+
+.javascript:hover {
+    filter: drop-shadow(0 0 2em #ffe21c);
+}
+
+.rust:hover {
+    filter: drop-shadow(0 0 2em #fe9153);
+}
+
+.c:hover {
+    filter: drop-shadow(0 0 2em #A8B9CC);
+}
+
+.cplusplus:hover {
+    filter: drop-shadow(0 0 2em #00599C);
+}
+
+.csharp:hover {
+    filter: drop-shadow(0 0 2em #bb00ff);
+}
+
+.typescript:hover {
+    filter: drop-shadow(0 0 2em #3178C6);
+}
+
+.html:hover {
+    filter: drop-shadow(0 0 2em #f0674f);
+}
+
+.css:hover {
+    filter: drop-shadow(0 0 2em #2489db);
+}
+
+.tailwind:hover {
+    filter: drop-shadow(0 0 2em #00d9ff);
+}
+
+.electron:hover {
+    filter: drop-shadow(0 0 2em #00d9ff);
+}
+
+.tauri:hover {
+    filter: drop-shadow(0 0 2em #FFC131);
+}
+
+.svelte:hover {
+    filter: drop-shadow(0 0 2em #FF3E00);
+}
+
+.vue:hover {
+    filter: drop-shadow(0 0 2em #4FC08D);
+}
+
+.dioxus:hover {
+    filter: drop-shadow(0 0 2em #21aaff);
+}
+
+.bun:hover {
+    filter: drop-shadow(0 0 2em #d0c16a);
+}
+
+.node:hover {
+    filter: drop-shadow(0 0 2em #00ff00); 
+}
+
+.surrealdb:hover {
+    filter: drop-shadow(0 0 2em #ff5ac8);
+}
+
+.vscode:hover {
+    filter: drop-shadow(0 0 2em #007ACC);
+}
+
+.vim:hover {
+    filter: drop-shadow(0 0 2em #019733);
+}
+
+.jetbrains:hover {
+    filter: drop-shadow(0 0 2em #f70088);
+}
+
+.git:hover {
+    filter: drop-shadow(0 0 2em #F05032);
+}
+
+.docker:hover {
+    filter: drop-shadow(0 0 2em #2496ED);
+}
+
+.aws:hover {
+    filter: drop-shadow(0 0 2em #FF9900);
+}
+
+.bash:hover {
+    filter: drop-shadow(0 0 2em #4EAA25);
+}
+
+.blender:hover {
+    filter: drop-shadow(0 0 2em #F5792A);
+}
+
+.adobe:hover {
+    filter: drop-shadow(0 0 2em #FF0000);
+}
+
+.linux:hover {
+    filter: drop-shadow(0 0 2em #FCC624);
+}
+
+.ghidra:hover {
+    filter: drop-shadow(0 0 2em #FF0000);
+}
+
+.idapro:hover {
+    filter: drop-shadow(0 0 2em #A80030);
+}
+

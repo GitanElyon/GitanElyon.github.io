@@ -1,0 +1,37 @@
+header h1 {
+    font-size: 15em;
+    margin: 0;
+    padding: 0;
+    margin-top: 5%;
+    margin-left: 5%;
+}
+
+header h2 {
+    font-size: 5em;
+    margin: 0;
+    padding: 0;
+    padding-left: 10px;
+    margin-left: 5%;
+    transform: translateY(-0.5em);
+}
+
+header button {
+    font-size: 2em;
+    margin: 0;
+    padding: 0;
+    margin-left: 5%;
+    margin-top: 5%;
+    padding: 10px;
+    background-color: #303030;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.5s, color 0.5s;
+}
+
+header button:hover {
+    background-color: #4b4b4b;
+    color: #ffffff;
+}
+
