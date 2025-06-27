@@ -1,24 +1,41 @@
 use dioxus::prelude::*;
+use crate::Route;
 
-const HEADER_SVG: Asset = asset!("/assets/header.svg");
+const PROFILE_IMAGE: Asset = asset!("/assets/profile.jpg");
 
 #[component]
 pub fn Hero() -> Element {
     rsx! {
-        // We can create elements inside the rsx macro with the element name followed by a block of attributes and children.
-        div {
-            // Attributes should be defined in the element before any children
+        section {
             id: "hero",
-            // After all attributes are defined, we can define child elements and components
-            img { src: HEADER_SVG, id: "header" }
-            div { id: "links",
-                // The RSX macro also supports text nodes surrounded by quotes
-                a { href: "https://dioxuslabs.com/learn/0.6/", "📚 Learn Dioxus" }
-                a { href: "https://dioxuslabs.com/awesome", "🚀 Awesome Dioxus" }
-                a { href: "https://github.com/dioxus-community/", "📡 Community Libraries" }
-                a { href: "https://github.com/DioxusLabs/sdk", "⚙️ Dioxus Development Kit" }
-                a { href: "https://marketplace.visualstudio.com/items?itemName=DioxusLabs.dioxus", "💫 VSCode Extension" }
-                a { href: "https://discord.gg/XgGxMSkvUM", "👋 Community Discord" }
+            div {
+                class: "hero-content",
+                div {
+                    class: "hero-text",
+                    h1 { "Gitan Elyon Mandell-Balogh" }
+                    h2 { "Software Engineer & Full-Stack Developer" }
+                    p {
+                        "Passionate about creating innovative solutions with modern web technologies. 
+                        Specializing in Rust, TypeScript, and building scalable applications."
+                    }
+                    div {
+                        class: "hero-buttons",
+                        Link {
+                            to: Route::Projects {},
+                            class: "btn btn-primary",
+                            "View My Work"
+                        }
+                        Link {
+                            to: Route::Contact {},
+                            class: "btn btn-secondary",
+                            "Get In Touch"
+                        }
+                    }
+                }
+                div {
+                    class: "hero-image",
+                    img { src: PROFILE_IMAGE, alt: "Gitan Elyon" }
+                }
             }
         }
     }
