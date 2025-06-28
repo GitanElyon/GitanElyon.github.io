@@ -205,16 +205,12 @@ body {
     border-color: #8b5cf6;
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
     box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
-    animation: expertGlow 3s ease-in-out infinite alternate;
 }
 
-@keyframes expertGlow {
-    0% {
-        box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
-    }
-    100% {
-        box-shadow: 0 0 25px rgba(139, 92, 246, 0.3);
-    }
+.skill-expert:hover {
+    transform: translateY(-5px);
+    border-color: #8b5cf6;
+    box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
 }
 
 .skill-name {
@@ -234,9 +230,6 @@ body {
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
     box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
 }
-.skill-advanced { border-color: #3b82f6; }
-.skill-intermediate { border-color: #6366f1; }
-.skill-beginner { border-color: #a855f7; }
 
 
 /* Projects Section */
@@ -602,6 +595,10 @@ body {
     color: #6b7280;
 }
 
+.success-message p {
+    color: #94a3b8;
+}
+
 .success-message {
     text-align: center;
     padding: 2rem;
@@ -612,9 +609,11 @@ body {
     margin-bottom: 1rem;
 }
 
-.success-message p {
+.error-message p {
     color: #94a3b8;
+    margin-bottom: 1.5rem;
 }
+
 
 /* Responsive Design for Skills */
 @media (max-width: 768px) {

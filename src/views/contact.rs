@@ -1,24 +1,57 @@
 use dioxus::prelude::*;
+use serde::Serialize;
+
+// Define the different states our form can be in
+#[derive(Clone, PartialEq)]
+enum FormStatus {
+    Idle,
+    Submitting,
+    Success,
+    Error(String),
+}
+
+// A struct to hold our form data, which we can serialize to JSON
+#[derive(Clone, Default, Serialize)]
+struct FormData {
+    name: String,
+    email: String,
+    message: String,
+}
 
 #[component]
 pub fn Contact() -> Element {
-    let mut name = use_signal(|| String::new());
-    let mut email = use_signal(|| String::new());
-    let mut message = use_signal(|| String::new());
-    let mut submitted = use_signal(|| false);
+    let mut form_data = use_signal(FormData::default);
+    let mut status = use_signal(|| FormStatus::Idle);
 
     let handle_submit = move |_| {
-        // In a real app, you'd send this data to a server
-        println!("Form submitted: {} {} {}", name(), email(), message());
-        submitted.set(true);
-        
-        // Reset form after a delay (in a real app, you'd handle this properly)
+        // Set the status to Submitting to show loading feedback
+        status.set(FormStatus::Submitting);
+
+        // Spawn an async task to send the data
         spawn(async move {
-            gloo_timers::future::TimeoutFuture::new(3_000).await;
-            submitted.set(false);
-            name.set(String::new());
-            email.set(String::new());
-            message.set(String::new());
+            let formspree_url = "https://formspree.io/f/mldnapzn"; // Replace with your Formspree ID
+
+            let client = reqwest::Client::new();
+            let response = client
+                .post(formspree_url)
+                .header("Accept", "application/json") // Important: This tells Formspree to send a JSON response instead of redirecting
+                .json(&form_data.read().clone())
+                .send()
+                .await;
+
+            match response {
+                Ok(res) if res.status().is_success() => {
+                    status.set(FormStatus::Success);
+                    form_data.set(FormData::default()); // Clear the form on success
+                }
+                Ok(res) => {
+                    let error_text = res.text().await.unwrap_or_else(|_| "An unknown error occurred.".to_string());
+                    status.set(FormStatus::Error(format!("Failed to send message: {}", error_text)));
+                }
+                Err(err) => {
+                    status.set(FormStatus::Error(format!("Network error: {}", err)));
+                }
+            }
         });
     };
 
@@ -30,9 +63,9 @@ pub fn Contact() -> Element {
                 h1 { "Get In Touch" }
                 div {
                     class: "contact-content",
-                    
                     div {
                         class: "contact-info",
+                        // ... your existing contact info ...
                         h2 { "Let's Connect" }
                         p {
                             "I'm always interested in hearing about new opportunities, 
@@ -44,17 +77,17 @@ pub fn Contact() -> Element {
                             div {
                                 class: "contact-method",
                                 h3 { "Email" }
-                                p { "gitanelyon@gmail.com" }
+                                p { "your-email@example.com" }
                             }
                             div {
                                 class: "contact-method",
                                 h3 { "Phone" }
-                                p { "(443) 224 8540" }
+                                p { "(555) 123-4567" }
                             }
                             div {
                                 class: "contact-method",
                                 h3 { "Location" }
-                                p { "Pikesville Maryland, United States" }
+                                p { "City, State, Country" }
                             }
                         }
 
@@ -64,66 +97,95 @@ pub fn Contact() -> Element {
                             div {
                                 class: "social-icons",
                                 a { href: "https://github.com/GitanElyon", target: "_blank", "GitHub" }
-                                a { href: "https://linkedin.com/in/GitanElyon", target: "_blank", "LinkedIn" }
-                                a { href: "https://discord.gg/kTzKSUcdZ6", target: "_blank", "Discord" }
+                                a { href: "https://linkedin.com/in/yourprofile", target: "_blank", "LinkedIn" }
+                                a { href: "https://twitter.com/yourhandle", target: "_blank", "Twitter" }
                             }
                         }
                     }
 
                     div {
                         class: "contact-form-container",
-                        if submitted() {
-                            div {
-                                class: "success-message",
-                                h3 { "Thanks for reaching out!" }
-                                p { "I'll get back to you as soon as possible." }
-                            }
-                        } else {
-                            form {
-                                class: "contact-form",
-                                onsubmit: handle_submit,
-                                prevent_default: "onsubmit",
-                                
+                        // Conditionally render based on the form status
+                        match status() {
+                            FormStatus::Success => rsx! {
                                 div {
-                                    class: "form-group",
-                                    label { r#for: "name", "Name" }
-                                    input {
-                                        r#type: "text",
-                                        id: "name",
-                                        required: true,
-                                        value: "{name}",
-                                        oninput: move |e| name.set(e.value()),
+                                    class: "success-message",
+                                    h3 { "Message Sent!" }
+                                    p { "Thanks for reaching out. I'll get back to you soon." }
+                                    button {
+                                        class: "btn btn-secondary",
+                                        onclick: move |_| status.set(FormStatus::Idle),
+                                        "Send Another"
                                     }
                                 }
-                                
+                            },
+                            FormStatus::Error(error_msg) => rsx! {
                                 div {
-                                    class: "form-group",
-                                    label { r#for: "email", "Email" }
-                                    input {
-                                        r#type: "email",
-                                        id: "email",
-                                        required: true,
-                                        value: "{email}",
-                                        oninput: move |e| email.set(e.value()),
+                                    class: "error-message",
+                                    h3 { "Something Went Wrong" }
+                                    p { "{error_msg}" }
+                                    button {
+                                        class: "btn btn-secondary",
+                                        onclick: move |_| status.set(FormStatus::Idle),
+                                        "Try Again"
                                     }
                                 }
-                                
-                                div {
-                                    class: "form-group",
-                                    label { r#for: "message", "Message" }
-                                    textarea {
-                                        id: "message",
-                                        rows: "5",
-                                        required: true,
-                                        value: "{message}",
-                                        oninput: move |e| message.set(e.value()),
+                            },
+                            _ => rsx! { // Idle and Submitting states
+                                form {
+                                    class: "contact-form",
+                                    prevent_default: "onsubmit",
+                                    onsubmit: handle_submit,
+                                    
+                                    div {
+                                        class: "form-group",
+                                        label { r#for: "name", "Name" }
+                                        input {
+                                            r#type: "text",
+                                            id: "name",
+                                            required: true,
+                                            disabled: status() == FormStatus::Submitting,
+                                            value: "{form_data.read().name}",
+                                            oninput: move |e| form_data.write().name = e.value(),
+                                        }
                                     }
-                                }
-                                
-                                button {
-                                    r#type: "submit",
-                                    class: "btn btn-primary submit-btn",
-                                    "Send Message"
+                                    
+                                    div {
+                                        class: "form-group",
+                                        label { r#for: "email", "Email" }
+                                        input {
+                                            r#type: "email",
+                                            id: "email",
+                                            required: true,
+                                            disabled: status() == FormStatus::Submitting,
+                                            value: "{form_data.read().email}",
+                                            oninput: move |e| form_data.write().email = e.value(),
+                                        }
+                                    }
+                                    
+                                    div {
+                                        class: "form-group",
+                                        label { r#for: "message", "Message" }
+                                        textarea {
+                                            id: "message",
+                                            rows: "5",
+                                            required: true,
+                                            disabled: status() == FormStatus::Submitting,
+                                            value: "{form_data.read().message}",
+                                            oninput: move |e| form_data.write().message = e.value(),
+                                        }
+                                    }
+                                    
+                                    button {
+                                        r#type: "submit",
+                                        class: "btn btn-primary",
+                                        disabled: status() == FormStatus::Submitting,
+                                        if status() == FormStatus::Submitting {
+                                            "Sending..."
+                                        } else {
+                                            "Send Message"
+                                        }
+                                    }
                                 }
                             }
                         }
