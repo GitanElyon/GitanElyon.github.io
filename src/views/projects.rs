@@ -36,9 +36,9 @@ pub fn Projects() -> Element {
                     }
                     ProjectCard {
                         title: "Papyr".to_string(),
-                        description: "Not quite ready to show it off yet, buts going to be gamechanging.".to_string(),
-                        technologies: vec!["Rust".to_string(), "Svelte".to_string(), "CSS".to_string()],
-                        github_url: Some("https://github.com/GitanElyon/catalyst".to_string()),
+                        description: "Papyr is a revoultionary new real time markdown editor designed to keep your life easy, efficient and organized".to_string(),
+                        technologies: vec!["Vue".to_string(), "Javascript".to_string(), "Markdown".to_string(), "CSS".to_string()],
+                        github_url: Some("https://github.com/GitanElyon/papyr".to_string()),
                         demo_url: None,
                         image_url: None,
                     }
