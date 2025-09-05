@@ -45,8 +45,14 @@ pub fn Contact() -> Element {
                     form_data.set(FormData::default()); // Clear the form on success
                 }
                 Ok(res) => {
-                    let error_text = res.text().await.unwrap_or_else(|_| "An unknown error occurred.".to_string());
-                    status.set(FormStatus::Error(format!("Failed to send message: {}", error_text)));
+                    let error_text = res
+                        .text()
+                        .await
+                        .unwrap_or_else(|_| "An unknown error occurred.".to_string());
+                    status.set(FormStatus::Error(format!(
+                        "Failed to send message: {}",
+                        error_text
+                    )));
                 }
                 Err(err) => {
                     status.set(FormStatus::Error(format!("Network error: {}", err)));
@@ -68,26 +74,26 @@ pub fn Contact() -> Element {
                         // ... your existing contact info ...
                         h2 { "Let's Connect" }
                         p {
-                            "I'm always interested in hearing about new opportunities, 
+                            "I'm always interested in hearing about new opportunities,
                             exciting projects, or just having a chat about technology."
                         }
-                        
+
                         div {
                             class: "contact-methods",
                             div {
                                 class: "contact-method",
                                 h3 { "Email" }
-                                p { "your-email@example.com" }
+                                p { "gitanelyon@gmail.com" }
                             }
                             div {
                                 class: "contact-method",
                                 h3 { "Phone" }
-                                p { "(555) 123-4567" }
+                                p { "(443)-224-8540" }
                             }
                             div {
                                 class: "contact-method",
                                 h3 { "Location" }
-                                p { "City, State, Country" }
+                                p { "Baltimore, Maryland, United States" }
                             }
                         }
 
@@ -97,8 +103,8 @@ pub fn Contact() -> Element {
                             div {
                                 class: "social-icons",
                                 a { href: "https://github.com/GitanElyon", target: "_blank", "GitHub" }
-                                a { href: "https://linkedin.com/in/yourprofile", target: "_blank", "LinkedIn" }
-                                a { href: "https://twitter.com/yourhandle", target: "_blank", "Twitter" }
+                                a { href: "https://linkedin.com/in/gitaneylon", target: "_blank", "LinkedIn" }
+                                a { href: "https://instagram.com/gitanelyon", target: "_blank", "Instagram" }
                             }
                         }
                     }
@@ -136,7 +142,7 @@ pub fn Contact() -> Element {
                                     class: "contact-form",
                                     prevent_default: "onsubmit",
                                     onsubmit: handle_submit,
-                                    
+
                                     div {
                                         class: "form-group",
                                         label { r#for: "name", "Name" }
@@ -149,7 +155,7 @@ pub fn Contact() -> Element {
                                             oninput: move |e| form_data.write().name = e.value(),
                                         }
                                     }
-                                    
+
                                     div {
                                         class: "form-group",
                                         label { r#for: "email", "Email" }
@@ -162,7 +168,7 @@ pub fn Contact() -> Element {
                                             oninput: move |e| form_data.write().email = e.value(),
                                         }
                                     }
-                                    
+
                                     div {
                                         class: "form-group",
                                         label { r#for: "message", "Message" }
@@ -175,7 +181,7 @@ pub fn Contact() -> Element {
                                             oninput: move |e| form_data.write().message = e.value(),
                                         }
                                     }
-                                    
+
                                     button {
                                         r#type: "submit",
                                         class: "btn btn-primary",
@@ -195,3 +201,4 @@ pub fn Contact() -> Element {
         }
     }
 }
+
