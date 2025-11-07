@@ -2,7 +2,7 @@
 // need dioxus
 use dioxus::prelude::*;
 
-use components::{Hero, ProjectCard, SkillBadge};
+use components::Background;
 use views::{About, Contact, Home, Navbar, Projects, Resume};
 
 /// Define a components module that contains all shared components for our app.
@@ -46,6 +46,7 @@ fn App() -> Element {
     rsx! {
         document::Link { rel: "icon", href: FAVICON }
         document::Link { rel: "stylesheet", href: MAIN_CSS }
+        Background {}
         Router::<Route> {}
     }
 }

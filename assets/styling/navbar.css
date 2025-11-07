@@ -4,9 +4,9 @@
   left: 0;
   right: 0;
   z-index: 1000;
-  background: rgba(10, 14, 26, 0.9);
+  background: rgba(20, 20, 20, 0.5);
   backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(124, 58, 237, 0.3);
+  border-bottom: 1px solid rgba(160, 160, 160, 0.3);
   padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
@@ -54,7 +54,7 @@
 }
 
 .nav-links a:hover {
-  color: #3b82f6;
+  color: #cccccc;
 }
 
 /* Add top padding to account for fixed navbar */

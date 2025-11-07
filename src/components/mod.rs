@@ -3,7 +3,9 @@
 mod hero;
 mod project_card;
 mod skill_badge;
+mod background;
 
 pub use hero::Hero;
 pub use project_card::ProjectCard;
 pub use skill_badge::SkillBadge;
+pub use background::Background;
