@@ -204,4 +204,3 @@ pub fn Contact() -> Element {
         }
     }
 }
-

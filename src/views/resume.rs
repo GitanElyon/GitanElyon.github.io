@@ -13,13 +13,13 @@ pub fn Resume() -> Element {
                 h1 { "Resume" }
                 div {
                     class: "resume-content",
-                    
+
                     // Header Section
                     div {
                         class: "resume-section",
                         h2 { "Gitan Elyon Mandell-Balogh" }
                         p { class: "resume-title", "Software Engineer & Full-Stack Developer" }
-                        p { class: "resume-contact", 
+                        p { class: "resume-contact",
                             "Email: gitanelyon@gmail.com | Phone: (443) 224-8540 | Location: Pikesville Baltimore"
                         }
                     }

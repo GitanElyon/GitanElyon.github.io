@@ -10,7 +10,7 @@ pub struct SkillBadgeProps {
 pub fn SkillBadge(props: SkillBadgeProps) -> Element {
     let level_class = match props.level.as_str() {
         "Expert" => "skill-expert",
-        "Advanced" => "skill-advanced", 
+        "Advanced" => "skill-advanced",
         "Intermediate" => "skill-intermediate",
         _ => "skill-beginner",
     };

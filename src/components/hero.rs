@@ -1,5 +1,5 @@
-use dioxus::prelude::*;
 use crate::Route;
+use dioxus::prelude::*;
 
 const PROFILE_IMAGE: Asset = asset!("/assets/profile.jpg");
 
@@ -15,7 +15,7 @@ pub fn Hero() -> Element {
                     h1 { "Gitan Elyon Mandell-Balogh" }
                     h2 { "Software Engineer & Full-Stack Developer" }
                     p {
-                        "Passionate about creating innovative solutions with modern web technologies. 
+                        "Passionate about creating innovative solutions with modern web technologies.
                         Specializing in Rust, TypeScript, and building scalable applications."
                     }
                     div {

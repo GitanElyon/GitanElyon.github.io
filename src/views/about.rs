@@ -16,11 +16,11 @@ pub fn About() -> Element {
                     div {
                         class: "about-text",
                         p {
-                            "I'm a passionate software engineer with a strong background in full-stack development. 
+                            "I'm a passionate software engineer with a strong background in full-stack development.
                             I love working with cutting-edge technologies and building applications that make a difference."
                         }
                         p {
-                            "My journey in software development started with a desire to find solutions to problems I find in everyday life. 
+                            "My journey in software development started with a desire to find solutions to problems I find in everyday life.
                             Over the years, I've honed my skills in various programming languages and frameworks, while maintaining a focus on performance and user experience."
                         }
                         h2 { "What I Do" }
@@ -43,7 +43,7 @@ pub fn About() -> Element {
                             I love spending time with friends and family, exploring new places, and learning about different cultures."
                         }
                         p {
-                            "I'm always looking for new challenges and opportunities to grow as a developer. 
+                            "I'm always looking for new challenges and opportunities to grow as a developer.
                             If you have an interesting project or just want to chat about technology, feel free to reach out!"
                         }
                     }
