@@ -35,7 +35,10 @@ enum Route {
 
 // Assets
 const FAVICON: Asset = asset!("/assets/favicon.ico");
-const MAIN_CSS: Asset = asset!("/assets/styling/main.css");
+// Removed MAIN_CSS and replaced with individual global styles
+const BASE_CSS: Asset = asset!("/assets/styling/base.css");
+const BACKGROUND_CSS: Asset = asset!("/assets/styling/background.css");
+const RESPONSIVE_CSS: Asset = asset!("/assets/styling/responsive.css");
 
 fn main() {
     dioxus::launch(App);
@@ -45,7 +48,10 @@ fn main() {
 fn App() -> Element {
     rsx! {
         document::Link { rel: "icon", href: FAVICON }
-        document::Link { rel: "stylesheet", href: MAIN_CSS }
+        // Global stylesheets
+        document::Link { rel: "stylesheet", href: BASE_CSS }
+        document::Link { rel: "stylesheet", href: BACKGROUND_CSS }
+        document::Link { rel: "stylesheet", href: RESPONSIVE_CSS }
         Background {}
         Router::<Route> {}
     }

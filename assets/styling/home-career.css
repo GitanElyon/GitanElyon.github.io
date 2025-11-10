@@ -1,0 +1,8 @@
+/* Home Career Section */
+.career-pane h2 { color: #fff; text-align: center; margin-bottom: 1.5rem; font-size: 2rem; }
+.career-pane .timeline { width: min(900px, 95vw); margin: 0 auto; padding: 1.5rem 2rem; }
+.career-pane .job { padding: 1rem 0; border-bottom: 1px solid rgba(255,255,255,0.12); }
+.career-pane .job:last-child { border-bottom: none; }
+.career-pane .job h3 { color: #fff; margin-bottom: .25rem; }
+.career-pane .job .meta { color: #e5e7eb; margin-bottom: .25rem; font-size: .95rem; }
+.career-pane .job p { color: #d1d5db; }

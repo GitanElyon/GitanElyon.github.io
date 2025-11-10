@@ -5,6 +5,14 @@ use std::rc::Rc;
 
 const PROFILE_IMAGE: Asset = asset!("/assets/profile.jpg");
 
+// Home page section stylesheets
+const HOME_ABOUT_CSS: Asset = asset!("/assets/styling/home-about.css");
+const HOME_HERO_CSS: Asset = asset!("/assets/styling/home-hero.css");
+const HOME_SKILLS_CSS: Asset = asset!("/assets/styling/home-skills.css");
+const HOME_PROJECTS_CSS: Asset = asset!("/assets/styling/home-projects.css");
+const HOME_CAREER_CSS: Asset = asset!("/assets/styling/home-career.css");
+const HOME_CONTACT_CSS: Asset = asset!("/assets/styling/home-contact.css");
+
 // Define icon assets
 const RUST_ICON: Asset = asset!("/icons/langs/rust.svg");
 const GO_ICON: Asset = asset!("/icons/langs/go.svg");
@@ -46,6 +54,17 @@ struct Skill {
     icon: Asset,
     hours: u32,
     projects: Vec<&'static str>,
+}
+
+// Small data model for About -> Main Technologies
+#[derive(Clone)]
+struct LanguageAbout {
+    name: &'static str,
+    brief: &'static str,
+    long: &'static str,
+    years: &'static str,
+    tools: Vec<&'static str>,
+    color: &'static str, // accent color for hover glow
 }
 
 #[derive(Clone, PartialEq)]
@@ -106,6 +125,42 @@ pub fn Home() -> Element {
         ]),
     ]);
 
+    // Data for About -> Main Technologies vertical list
+    let main_langs: Vec<LanguageAbout> = vec![
+        LanguageAbout {
+            name: "Rust",
+            brief: "Memory-safe and performant",
+            long: "Rust is my go-to language for building memory-safe, high-performance applications. Rust often becomes the core of my projects thanks to its reliability and speed.",
+            years: "~1.5 years",
+            tools: vec!["Tauri", "Dioxus", "Suilend"],
+            color: "#DEA584",
+        },
+        LanguageAbout {
+            name: "Go",
+            brief: "Simple, fast and reliable",
+            long: "Go is my choice for building scalable backend services with simplicity and efficiency.",
+            years: "~1 year",
+            tools: vec!["Microservices", "REST", "gRPC"],
+            color: "#00ADD8",
+        },
+        LanguageAbout {
+            name: "Python",
+            brief: "Versatile and powerful",
+            long: "Python is my tool for prototyping, scripting, and automating anything I need done quickly.",
+            years: "~4 years",
+            tools: vec!["Pandas", "FastAPI", "NumPy"],
+            color: "#3776AB",
+        },
+        LanguageAbout {
+            name: "JavaScript",
+            brief: "Dynamic and flexible",
+            long: "JavaScript isn't my favorite stack to write in, but if I can dream it, JS can make it happen.",
+            years: "~2.5 years",
+            tools: vec!["Node", "Vue", "Svelte"],
+            color: "#F7DF1E",
+        },
+    ];
+
     // State for carousel index & expanded project
     let mut current_section = use_signal(|| 0usize);
     let mut expanded_project = use_signal(|| None::<usize>);
@@ -113,6 +168,8 @@ pub fn Home() -> Element {
     let mut form_status = use_signal(|| FormStatus::Idle);
     let mut slide_direction = use_signal(|| "");
     let mut selected_skill = use_signal(|| None::<usize>);
+    // About -> Main Technologies state
+    let mut selected_lang_about = use_signal(|| None::<usize>);
 
     // Helper to cycle index with animation
     let prev_section = {
@@ -173,6 +230,14 @@ pub fn Home() -> Element {
     };
 
     rsx! {
+        // Load per-section styles for the home page
+        document::Link { rel: "stylesheet", href: HOME_ABOUT_CSS }
+        document::Link { rel: "stylesheet", href: HOME_HERO_CSS }
+        document::Link { rel: "stylesheet", href: HOME_SKILLS_CSS }
+        document::Link { rel: "stylesheet", href: HOME_PROJECTS_CSS }
+        document::Link { rel: "stylesheet", href: HOME_CAREER_CSS }
+        document::Link { rel: "stylesheet", href: HOME_CONTACT_CSS }
+
         // HERO --------------------------------------------------------------
         section {
             id: "hero",
@@ -207,14 +272,83 @@ pub fn Home() -> Element {
             }
         }
         // ABOUT --------------------------------------------------------------
-        section { id: "about-section", class: "home-section about-center",
+        section { id: "about-section", class: "home-section about-center home-about",
             h2 { class: "section-title", "About Me" }
-            div { class: "glass-bw inner",
-                p { "I'm a passionate software engineer focused on full‑stack and systems development. I build efficient, user‑centric applications and explore ways to push performance and reliability." }
-                p { "My journey started with solving everyday problems. Since then I've worked across languages and platforms refining a pragmatic mindset toward shipping maintainable, high‑quality software." }
+            div { class: "glass-bw about-card inner",
+                div { class: "about-grid",
+                    div { class: "gen-info",
+                        h3 { "Who Am I?" }
+                        p { "I'm a passionate software engineer with a strong background in full‑stack and systems development. I build efficient, user‑centric applications and explore ways to push performance and reliability." }
+                        p { "My journey started with solving everyday problems. Since then I've worked across several languages and platforms refining a pragmatic mindset toward shipping maintainable, high‑quality software." }
+                    }
+                    div { class: "current-work",
+                        h3 { "Currently Working On" }
+                        h4 { "Papyr" }
+                        p { "A lightweight, real‑time markdown editor component designed to seamlessly integrate into web apps with a focus on speed and customization." }
+                        p { "Demo coming soon!" }
+                        a { href: "https://github.com/gitanelyon/papyr", target: "_blank", class: "link", "GitHub ↗" }
+                        div { class: "tags",
+                            span { "TypeScript" }
+                            span { "HTML" }
+                            span { "CSS" }
+                            span { "Markdown" }
+                        }
+                    }
+                    div { class: "about-languages",
+                        h3 { "Main Technologies" }
+                        // Vertical list of main languages - expand on click only
+                        div { class: "lang-list",
+                            if let Some(sel_idx) = selected_lang_about() {
+                                {
+                                    let lang = &main_langs[sel_idx];
+                                    let skill_opt = skill_sections[0].1.iter().find(|s| s.name == lang.name);
+                                    let hours = skill_opt.map(|s| s.hours).unwrap_or(0);
+                                    let projects: Vec<&'static str> = skill_opt.map(|s| s.projects.clone()).unwrap_or_default();
+                                    let projects_count = projects.len();
+
+                                    rsx! {
+                                        div { class: "lang-expanded", style: "--glow: {lang.color};",
+                                            onclick: move |_| selected_lang_about.set(None),
+                                            h4 { "{lang.name} | {lang.brief}" }
+                                            p { "{lang.long}" }
+                                            p { class: "stats", "Stats: {lang.years}, +{hours} hours, {projects_count} projects." }
+                                            if !lang.tools.is_empty() {
+                                                p { class: "tools",
+                                                    b { "Tools: " }
+                                                    for (i, t) in lang.tools.iter().enumerate() {
+                                                        span { "{t}" }
+                                                        if i < lang.tools.len()-1 { span { ", " } }
+                                                    }
+                                                }
+                                            }
+                                            if !projects.is_empty() {
+                                                p { class: "projects",
+                                                    b { "Projects: " }
+                                                    for (i, prj) in projects.iter().enumerate() {
+                                                        span { "{prj}" }
+                                                        if i < projects.len()-1 { span { ", " } }
+                                                    }
+                                                }
+                                            }
+                                            p { class: "hint", "Click to collapse" }
+                                        }
+                                    }
+                                }
+                            } else {
+                                for (idx, lang) in main_langs.iter().enumerate() {
+                                    div { class: "lang-row", style: "--glow: {lang.color};",
+                                        onclick: move |_| selected_lang_about.set(Some(idx)),
+                                        span { class: "lang-name", "{lang.name}" }
+                                        span { class: "lang-sep", " | " }
+                                        span { class: "lang-brief", "{lang.brief}" }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
-
         // SKILLS -------------------------------------------------------------
         section { id: "skills-section", class: "home-section skills-pane",
             h2 { class: "section-title", "Skills" }
@@ -401,7 +535,7 @@ pub fn Home() -> Element {
                         div { class: "social-links",
                             h4 { "Follow Me" }
                             div { class: "social-icons",
-                                a { href: "https://github.com/GitanElyon", target: "_blank", "GitHub"}
+                                a { href: "https://github.com/GitanElyon", target: "_blank", "GitHub ↗"}
                                 a { href: "https://linkedin.com/in/gitaneylon", target: "_blank", "LinkedIn" }
                             }
                         }

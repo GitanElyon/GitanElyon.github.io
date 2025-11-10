@@ -1,8 +1,11 @@
 use dioxus::prelude::*;
 
+const RESUME_CSS: Asset = asset!("/assets/styling/resume.css");
+
 #[component]
 pub fn Resume() -> Element {
     rsx! {
+        document::Link { rel: "stylesheet", href: RESUME_CSS }
         section {
             id: "resume",
             div {

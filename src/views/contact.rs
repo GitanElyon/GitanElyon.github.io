@@ -1,6 +1,8 @@
 use dioxus::prelude::*;
 use serde::Serialize;
 
+const CONTACT_CSS: Asset = asset!("/assets/styling/contact.css");
+
 // Define the different states our form can be in
 #[derive(Clone, PartialEq)]
 enum FormStatus {
@@ -23,7 +25,8 @@ pub fn Contact() -> Element {
     let mut form_data = use_signal(FormData::default);
     let mut status = use_signal(|| FormStatus::Idle);
 
-    let handle_submit = move |_| {
+    let handle_submit = move |evt: FormEvent| {
+        evt.prevent_default();
         // Set the status to Submitting to show loading feedback
         status.set(FormStatus::Submitting);
 
@@ -62,6 +65,7 @@ pub fn Contact() -> Element {
     };
 
     rsx! {
+        document::Link { rel: "stylesheet", href: CONTACT_CSS }
         section {
             id: "contact",
             div {
@@ -140,7 +144,6 @@ pub fn Contact() -> Element {
                             _ => rsx! { // Idle and Submitting states
                                 form {
                                     class: "contact-form",
-                                    prevent_default: "onsubmit",
                                     onsubmit: handle_submit,
 
                                     div {

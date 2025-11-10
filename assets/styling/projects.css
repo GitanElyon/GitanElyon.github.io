@@ -1,0 +1,14 @@
+/* Projects Page */
+#projects { padding: 5rem 0; }
+#projects h1 { text-align: center; font-size: 3rem; margin-bottom: 3rem; }
+.projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; }
+.project-card { background: rgba(80, 80, 80, 0.1); border: 1px solid rgba(160, 160, 160, 0.3); border-radius: 16px; overflow: hidden; transition: all 0.3s ease; backdrop-filter: blur(10px); }
+.project-card:hover { transform: translateY(-10px); border-color: #cccccc; box-shadow: 0 20px 40px rgba(160, 160, 160, 0.3); }
+.project-content { padding: 2rem; }
+.project-content h3 { font-size: 1.5rem; margin-bottom: 1rem; color: #cccccc; }
+.project-content p { color: #94a3b8; margin-bottom: 1.5rem; }
+.tech-stack { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+.tech-tag { background: rgba(160, 160, 160, 0.2); color: #cccccc; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 500; }
+.project-links { display: flex; gap: 1rem; }
+.project-links a { color: #cccccc; text-decoration: none; font-weight: 600; transition: color 0.3s ease; }
+.project-links a:hover { color: #999999; }
