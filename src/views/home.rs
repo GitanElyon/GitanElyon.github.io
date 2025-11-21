@@ -455,7 +455,7 @@ pub fn Home() -> Element {
                     h2 { "Software Engineer & Full-Stack Developer" }
                     p {
                         "Passionate about creating innovative solutions with modern web technologies.
-                        Specializing in Rust, TypeScript, and building scalable applications."
+                        Specializing in Rust and JavaScript I work to build modern applications."
                     }
                     div {
                         class: "hero-buttons",
@@ -826,7 +826,7 @@ pub fn Home() -> Element {
                     div { class: "project-card-bw expanded", onclick: toggle_project(1),
                         h3 { "Papyr" }
                         p { class: "detail", "A real‑time markdown editor focused on speed, simplicity and staying organized across notes." }
-                        div { class: "tags", span { "Vue" } span { "JavaScript" } span { "Markdown" } span { "CSS" } }
+                        div { class: "tags", span { "TypeScript" } span { "JavaScript" } span { "Markdown" } span { "CSS" } }
                         a { href: "https://github.com/GitanElyon/papyr", target: "_blank", class: "link", "GitHub ↗" }
                     }
                 } else {
@@ -834,7 +834,7 @@ pub fn Home() -> Element {
                     div { class: "project-card-bw expanded", onclick: toggle_project(2),
                         h3 { "Rust Liquidator" }
                         p { class: "detail", "High‑performance algorithmic trading bot leveraging async Rust, orderbook streaming & rapid decision logic." }
-                        div { class: "tags", span { "Rust" } span { "Async" } span { "WebSockets" } span { "Trading" } }
+                        div { class: "tags", span { "Rust" } span { "Crypto" } span { "Suilend" } span { "Database" } }
                         p { class: "note", "Private Repository" }
                     }
                 }
