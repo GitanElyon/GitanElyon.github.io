@@ -3,7 +3,7 @@ use dioxus::prelude::*;
 #[derive(Props, Clone, PartialEq)]
 pub struct SkillBadgeProps {
     name: String,
-    level: String, // "Beginner", "Intermediate", "Advanced", "Expert"
+    level: String,
 }
 
 #[component]
@@ -16,8 +16,7 @@ pub fn SkillBadge(props: SkillBadgeProps) -> Element {
     };
 
     rsx! {
-        div {
-            class: "skill-badge {level_class}",
+        div { class: "skill-badge {level_class}",
             span { class: "skill-name", "{props.name}" }
             span { class: "skill-level", "{props.level}" }
         }

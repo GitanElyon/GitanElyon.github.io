@@ -1,81 +1,97 @@
-use crate::components::ProjectCard;
+use crate::data::projects::get_projects;
 use dioxus::prelude::*;
 
 const PROJECTS_CSS: Asset = asset!("/assets/styling/projects.css");
 
 #[component]
 pub fn Projects() -> Element {
+    let projects = get_projects();
+    let mut selected_project_id = use_signal(|| None::<String>);
+
+    let open_project = |id: &'static str| {
+        let id_string = id.to_string();
+        move |_| {
+            selected_project_id.set(Some(id_string.clone()));
+        }
+    };
+
+    let close_modal = move |_| {
+        selected_project_id.set(None);
+    };
+
     rsx! {
         document::Link { rel: "stylesheet", href: PROJECTS_CSS }
-        section {
-            id: "projects",
-            div {
-                class: "container",
+        section { id: "projects",
+            div { class: "container",
                 h1 { "My Projects" }
-                div {
-                    class: "projects-grid",
-                    ProjectCard {
-                        title: "Loginsight".to_string(),
-                        description: "A lightweight and modern desktop app to help Windows users identify computer issues and speed up their computers.".to_string(),
-                        technologies: vec!["Tauri".to_string(), "Rust".to_string(), "HTML".to_string(), "CSS".to_string(), "JavaScript".to_string()],
-                        github_url: Some("https://github.com/GitanElyon/loginsight".to_string()),
-                        image_url: None,
+                p { class: "click-hint", "Click any card for details" }
+
+                // Grid of tiles
+                div { class: "projects-list",
+                    for project in &projects {
+                        div {
+                            class: "project-tile",
+                            style: "--glow-color: {project.glow_color}",
+                            onclick: open_project(project.id),
+
+                            div { class: "project-content-brief",
+                                h3 { "{project.name}" }
+                                p { class: "brief", "{project.brief}" }
+                            }
+                        }
                     }
-                    ProjectCard {
-                        title: "YAWMA".to_string(),
-                        description: "Yet Another Workload Managment App is a tool I built to help keep on tast with my dailey work life using git, cloud storage and other tools to help users track their work.".to_string(),
-                        technologies: vec!["Tauri".to_string(), "Rust".to_string(), "HTML".to_string(), "CSS".to_string(), "JavaScript".to_string()],
-                        github_url: Some("https://github.com/GitanElyon/YAWMA".to_string()),
-                        demo_url: None,
-                        image_url: None,
-                    }
-                    ProjectCard {
-                        title: "Catalyst".to_string(),
-                        description: "A super minimal and lightweight code editor designed to expide the process of idea to product with no distractions".to_string(),
-                        technologies: vec!["Tauri".to_string(), "Rust".to_string(), "Dioxus".to_string(), "CSS".to_string()],
-                        github_url: Some("https://github.com/GitanElyon/catalyst".to_string()),
-                        demo_url: None,
-                        image_url: None,
-                    }
-                    ProjectCard {
-                        title: "Papyr".to_string(),
-                        description: "Papyr is a revoultionary new real time markdown editor designed to keep your life easy, efficient and organized".to_string(),
-                        technologies: vec!["Vue".to_string(), "Javascript".to_string(), "Markdown".to_string(), "CSS".to_string()],
-                        github_url: Some("https://github.com/GitanElyon/papyr".to_string()),
-                        demo_url: None,
-                        image_url: None,
-                    }
-                    ProjectCard {
-                        title: "Minos".to_string(),
-                        description: "An AI designed to play tetris perfectly in real time using python to read the screen and rust for calculations".to_string(),
-                        technologies: vec!["Rust".to_string(), "Python".to_string(), "AI".to_string(), "Machine Learning".to_string()],
-                        github_url: Some("https://github.com/GitanElyon/minos".to_string()),
-                        demo_url: None,
-                        image_url: None,
-                    }
-                    ProjectCard {
-                        title: "Blackjack AI".to_string(),
-                        description: "An AI built to play blackjack as optimally as possible.".to_string(),
-                        technologies: vec!["Rust".to_string(), "AI".to_string(), "Machine Learning".to_string()],
-                        github_url: Some("https://github.com/GitanElyon/blackjack-ai".to_string()),
-                        demo_url: None,
-                        image_url: None,
-                    }
-                    /*ProjectCard {
-                        title: "Example Project 2".to_string(),
-                        description: "Description of another project you've worked on. Add real projects here.".to_string(),
-                        technologies: vec!["TypeScript".to_string(), "React".to_string(), "Node.js".to_string()],
-                        github_url: Some("https://github.com/GitanElyon".to_string()),
-                        demo_url: None,
-                        image_url: None,
-                    }*/
-                    ProjectCard {
-                        title: "Portfolio Website".to_string(),
-                        description: "A modern portfolio website built with Dioxus and Rust, showcasing responsive design and WebAssembly performance.".to_string(),
-                        technologies: vec!["Rust".to_string(), "Dioxus".to_string(), "WebAssembly".to_string(), "CSS".to_string()],
-                        github_url: Some("https://github.com/GitanElyon/gitanelyon.github.io".to_string()),
-                        demo_url: Some("https://gitanelyon.github.io".to_string()),
-                        image_url: None,
+                }
+
+                // Modal Overlay
+                if let Some(id_str) = selected_project_id() {
+                    if let Some(project) = projects.iter().find(|p| p.id == id_str) {
+                        div { class: "modal-overlay", onclick: close_modal, // Close when clicking background
+                            div {
+                                class: "modal-content",
+                                style: "--glow-color: {project.glow_color}",
+                                onclick: |evt| evt.stop_propagation(), // Prevent closing when clicking content
+
+                                button {
+                                    class: "modal-close-btn",
+                                    onclick: close_modal,
+                                    "×"
+                                }
+
+                                h3 { "{project.name}" }
+
+                                for para in &project.detailed_description {
+                                    p { class: "detail", "{para}" }
+                                }
+
+                                div { class: "tags",
+                                    for tech in &project.technologies {
+                                        span { "{tech}" }
+                                    }
+                                }
+
+                                if let Some(url) = project.github_url {
+                                    a {
+                                        href: "{url}",
+                                        target: "_blank",
+                                        class: "link",
+                                        "GitHub ↗"
+                                    }
+                                }
+
+                                if let Some(url) = project.demo_url {
+                                    a {
+                                        href: "{url}",
+                                        target: "_blank",
+                                        class: "link",
+                                        "Live Demo ↗"
+                                    }
+                                }
+
+                                if project.private {
+                                    p { class: "note", "Private Repository" }
+                                }
+                            }
+                        }
                     }
                 }
             }

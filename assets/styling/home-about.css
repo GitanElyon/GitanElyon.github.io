@@ -1,6 +1,11 @@
 /* Home About Section Styles */
-.home-about .about-card { padding: 2.5rem 2.25rem; display: flex; flex-direction: column; gap: 2.25rem; }
-.home-about .about-grid { display: grid; grid-template-columns: repeat(2,minmax(300px,1fr)); grid-template-areas: "gen gen" "work langs"; gap: 2.25rem; }
+/* .about-card removed, now applying styles to children directly */
+.home-about .about-grid { display: grid; grid-template-columns: repeat(2,minmax(300px,1fr)); grid-template-areas: "gen gen" "work langs"; gap: 2.25rem; width: 100%; max-width: 900px; margin: 0 auto; }
+
+.home-about .gen-info,
+.home-about .current-work,
+.home-about .about-languages { padding: 2.5rem 2.25rem; display: flex; flex-direction: column; }
+
 .home-about .gen-info p { color: #d1d5db; line-height: 1.6; margin-bottom: 1rem; }
 .home-about .current-work h3 { color: #ffffff; font-size: 1.15rem; margin-bottom: .35rem; letter-spacing: .5px; text-transform: uppercase; opacity: .85; }
 .home-about .current-work h4 { color: #fff; font-size: 1.35rem; margin-bottom: .75rem; }

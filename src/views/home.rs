@@ -1,4 +1,6 @@
 use crate::Route;
+use crate::data::projects::get_projects;
+use crate::data::skills::{Skill, LanguageAbout, get_skill_sections, get_about_languages};
 use dioxus::prelude::*;
 use serde::Serialize;
 use std::rc::Rc;
@@ -12,40 +14,6 @@ const HOME_SKILLS_CSS: Asset = asset!("/assets/styling/home-skills.css");
 const HOME_PROJECTS_CSS: Asset = asset!("/assets/styling/home-projects.css");
 const HOME_CAREER_CSS: Asset = asset!("/assets/styling/home-career.css");
 const HOME_CONTACT_CSS: Asset = asset!("/assets/styling/home-contact.css");
-
-// Define icon assets
-const RUST_ICON: Asset = asset!("/icons/langs/rust.svg");
-const GO_ICON: Asset = asset!("/icons/langs/go.svg");
-const PYTHON_ICON: Asset = asset!("/icons/langs/python.svg");
-const JS_ICON: Asset = asset!("/icons/langs/js.svg");
-const TS_ICON: Asset = asset!("/icons/langs/ts.svg");
-const JAVA_ICON: Asset = asset!("/icons/langs/java.svg");
-const HTML_ICON: Asset = asset!("/icons/langs/html-5.svg");
-const CSS_ICON: Asset = asset!("/icons/langs/css-3.svg");
-const C_ICON: Asset = asset!("/icons/langs/c.svg");
-const CPP_ICON: Asset = asset!("/icons/langs/cpp.svg");
-const CSHARP_ICON: Asset = asset!("/icons/langs/csharp.svg");
-const LUA_ICON: Asset = asset!("/icons/langs/lua.svg");
-
-const TAURI_ICON: Asset = asset!("/icons/frameworks/tauri.svg");
-const BUN_ICON: Asset = asset!("/icons/frameworks/bun.svg");
-const DIOXUS_ICON: Asset = asset!("/icons/frameworks/dioxus.png");
-const NODE_ICON: Asset = asset!("/icons/frameworks/node-js.svg");
-const SVELTE_ICON: Asset = asset!("/icons/frameworks/svelte.svg");
-const VUE_ICON: Asset = asset!("/icons/frameworks/vue.svg");
-const REACT_ICON: Asset = asset!("/icons/frameworks/react.svg");
-const ELECTRON_ICON: Asset = asset!("/icons/frameworks/electron.svg");
-
-const LINUX_ICON: Asset = asset!("/icons/tools/linux.svg");
-const GIT_ICON: Asset = asset!("/icons/tools/git.svg");
-const NIX_ICON: Asset = asset!("/icons/tools/nix.svg");
-const DOCKER_ICON: Asset = asset!("/icons/tools/docker.svg");
-const ADOBE_ICON: Asset = asset!("/icons/tools/adobe.svg");
-const FIGMA_ICON: Asset = asset!("/icons/tools/figma.svg");
-
-const POSTGRES_ICON: Asset = asset!("/icons/data/postgresql.svg");
-const SOLR_ICON: Asset = asset!("/icons/data/apachesolr.svg");
-const SURREALDB_ICON: Asset = asset!("/icons/data/surrealdb.svg");
 
 fn skill_color(name: &str) -> &'static str {
     match name {
@@ -82,26 +50,6 @@ fn skill_color(name: &str) -> &'static str {
     }
 }
 
-// Skill with icon path, name, hours, and projects
-#[derive(Clone)]
-struct Skill {
-    name: &'static str,
-    icon: Asset,
-    hours: u32,
-    projects: Vec<&'static str>,
-}
-
-// Small data model for About -> Main Technologies
-#[derive(Clone)]
-struct LanguageAbout {
-    name: &'static str,
-    brief: &'static str,
-    long: &'static str,
-    years: &'static str,
-    tools: Vec<&'static str>,
-    color: &'static str, // accent color for hover glow
-}
-
 #[derive(Clone, PartialEq)]
 enum FormStatus {
     Idle,
@@ -120,242 +68,17 @@ struct FormData {
 #[component]
 pub fn Home() -> Element {
     // Skills data grouped into 4 sections with icons and primary colors
-    let skill_sections: Rc<Vec<(&'static str, Vec<Skill>)>> = Rc::new(vec![
-        (
-            "Languages",
-            vec![
-                Skill {
-                    name: "Rust",
-                    icon: RUST_ICON,
-                    hours: 300,
-                    projects: vec!["Minos", "Portfolio", "Blackjack AI", "Suilend Liquidator"],
-                },
-                Skill {
-                    name: "Go",
-                    icon: GO_ICON,
-                    hours: 100,
-                    projects: vec!["Backend APIs", "Microservices"],
-                },
-                Skill {
-                    name: "Python",
-                    icon: PYTHON_ICON,
-                    hours: 150,
-                    projects: vec!["ML Models", "Data Analysis", "Automation"],
-                },
-                Skill {
-                    name: "JavaScript",
-                    icon: JS_ICON,
-                    hours: 150,
-                    projects: vec!["Web Apps", "Node Services"],
-                },
-                Skill {
-                    name: "TypeScript",
-                    icon: TS_ICON,
-                    hours: 100,
-                    projects: vec!["Full Stack Apps", "Type-safe APIs"],
-                },
-                Skill {
-                    name: "Java",
-                    icon: JAVA_ICON,
-                    hours: 80,
-                    projects: vec!["Enterprise Apps", "Android"],
-                },
-                Skill {
-                    name: "HTML",
-                    icon: HTML_ICON,
-                    hours: 120,
-                    projects: vec!["Web Development"],
-                },
-                Skill {
-                    name: "CSS",
-                    icon: CSS_ICON,
-                    hours: 100,
-                    projects: vec!["UI/UX Design"],
-                },
-                Skill {
-                    name: "C",
-                    icon: C_ICON,
-                    hours: 50,
-                    projects: vec!["Systems Programming"],
-                },
-                Skill {
-                    name: "C++",
-                    icon: CPP_ICON,
-                    hours: 20,
-                    projects: vec!["Game Development"],
-                },
-                Skill {
-                    name: "C#",
-                    icon: CSHARP_ICON,
-                    hours: 60,
-                    projects: vec![".NET Apps"],
-                },
-                Skill {
-                    name: "Lua",
-                    icon: LUA_ICON,
-                    hours: 30,
-                    projects: vec!["Scripting", "Neovim Config"],
-                },
-            ],
-        ),
-        (
-            "Frameworks",
-            vec![
-                Skill {
-                    name: "Tauri",
-                    icon: TAURI_ICON,
-                    hours: 200,
-                    projects: vec!["Desktop Apps"],
-                },
-                Skill {
-                    name: "Bun.js",
-                    icon: BUN_ICON,
-                    hours: 120,
-                    projects: vec!["Fast Runtimes"],
-                },
-                Skill {
-                    name: "Dioxus",
-                    icon: DIOXUS_ICON,
-                    hours: 150,
-                    projects: vec!["This Portfolio!"],
-                },
-                Skill {
-                    name: "Node.js",
-                    icon: NODE_ICON,
-                    hours: 40,
-                    projects: vec!["Backend Services"],
-                },
-                Skill {
-                    name: "Svelte",
-                    icon: SVELTE_ICON,
-                    hours: 160,
-                    projects: vec!["Interactive UIs"],
-                },
-                Skill {
-                    name: "Vue",
-                    icon: VUE_ICON,
-                    hours: 80,
-                    projects: vec!["Papyr"],
-                },
-                Skill {
-                    name: "React",
-                    icon: REACT_ICON,
-                    hours: 20,
-                    projects: vec!["Web Apps"],
-                },
-                Skill {
-                    name: "Electron",
-                    icon: ELECTRON_ICON,
-                    hours: 40,
-                    projects: vec!["Cross-Platform Apps"],
-                },
-            ],
-        ),
-        (
-            "Tools",
-            vec![
-                Skill {
-                    name: "Linux",
-                    icon: LINUX_ICON,
-                    hours: 1500,
-                    projects: vec!["Daily Driver", "Server Management"],
-                },
-                Skill {
-                    name: "Git",
-                    icon: GIT_ICON,
-                    hours: 800,
-                    projects: vec!["Version Control", "Collaboration"],
-                },
-                Skill {
-                    name: "Nix",
-                    icon: NIX_ICON,
-                    hours: 700,
-                    projects: vec!["Reproducible Builds"],
-                },
-                Skill {
-                    name: "Docker",
-                    icon: DOCKER_ICON,
-                    hours: 100,
-                    projects: vec!["Containerization"],
-                },
-                Skill {
-                    name: "Adobe",
-                    icon: ADOBE_ICON,
-                    hours: 200,
-                    projects: vec!["Design Work"],
-                },
-                Skill {
-                    name: "Figma",
-                    icon: FIGMA_ICON,
-                    hours: 150,
-                    projects: vec!["UI Design"],
-                },
-            ],
-        ),
-        (
-            "Databases",
-            vec![
-                Skill {
-                    name: "PostgreSQL",
-                    icon: POSTGRES_ICON,
-                    hours: 50,
-                    projects: vec!["Relational DBs"],
-                },
-                Skill {
-                    name: "Solr",
-                    icon: SOLR_ICON,
-                    hours: 30,
-                    projects: vec!["Search Engines"],
-                },
-                Skill {
-                    name: "SurrealDB",
-                    icon: SURREALDB_ICON,
-                    hours: 20,
-                    projects: vec!["Modern DBs"],
-                },
-            ],
-        ),
-    ]);
+    let skill_sections: Rc<Vec<(&'static str, Vec<Skill>)>> = Rc::new(get_skill_sections());
 
     // Data for About -> Main Technologies vertical list
-    let main_langs: Vec<LanguageAbout> = vec![
-        LanguageAbout {
-            name: "Rust",
-            brief: "Memory-safe and performant",
-            long: "Rust is my go-to language for building memory-safe, high-performance applications. Rust often becomes the core of my projects thanks to its reliability and speed.",
-            years: "~1.5 years",
-            tools: vec!["Tauri", "Dioxus", "Suilend"],
-            color: "#DEA584",
-        },
-        LanguageAbout {
-            name: "Go",
-            brief: "Simple, fast and reliable",
-            long: "Go is my choice for building scalable backend services with simplicity and efficiency.",
-            years: "~1 year",
-            tools: vec!["Microservices", "REST", "gRPC"],
-            color: "#00ADD8",
-        },
-        LanguageAbout {
-            name: "Python",
-            brief: "Versatile and powerful",
-            long: "Python is my tool for prototyping, scripting, and automating anything I need done quickly.",
-            years: "~4 years",
-            tools: vec!["Pandas", "FastAPI", "NumPy"],
-            color: "#3776AB",
-        },
-        LanguageAbout {
-            name: "JavaScript",
-            brief: "Dynamic and flexible",
-            long: "JavaScript isn't my favorite stack to write in, but if I can dream it, JS can make it happen.",
-            years: "~2.5 years",
-            tools: vec!["Node", "Vue", "Svelte"],
-            color: "#F7DF1E",
-        },
-    ];
+    let main_langs: Vec<LanguageAbout> = get_about_languages();
+
+    // Data for Projects
+    let projects = use_memo(|| get_projects());
 
     // State for carousel index & expanded project
     let mut current_section = use_signal(|| 0usize);
-    let mut expanded_project = use_signal(|| None::<usize>);
+    let mut expanded_project = use_signal(|| None::<String>);
     let mut form_data = use_signal(FormData::default);
     let mut form_status = use_signal(|| FormStatus::Idle);
     let mut slide_direction = use_signal(|| "");
@@ -387,12 +110,13 @@ pub fn Home() -> Element {
     };
 
     // Toggle expansion for a given project id
-    let toggle_project = |id: usize| {
+    let toggle_project = |id: &'static str| {
+        let id_string = id.to_string();
         move |_| {
-            if expanded_project() == Some(id) {
+            if expanded_project() == Some(id_string.clone()) {
                 expanded_project.set(None);
             } else {
-                expanded_project.set(Some(id));
+                expanded_project.set(Some(id_string.clone()));
             }
         }
     };
@@ -445,54 +169,54 @@ pub fn Home() -> Element {
         document::Link { rel: "stylesheet", href: HOME_CONTACT_CSS }
 
         // HERO --------------------------------------------------------------
-        section {
-            id: "hero",
-            div {
-                class: "hero-content",
-                div {
-                    class: "hero-text",
+        section { id: "hero",
+            div { class: "hero-content",
+                div { class: "hero-text",
                     h1 { "Gitan Elyon Mandell-Balogh" }
                     h2 { "Software Engineer & Full-Stack Developer" }
                     p {
                         "Passionate about creating innovative solutions with modern web technologies.
                         Specializing in Rust and JavaScript I work to build modern applications."
                     }
-                    div {
-                        class: "hero-buttons",
-                        Link {
-                            to: Route::Projects {},
-                            class: "btn btn-primary",
-                            "View My Work"
-                        }
-                        Link {
-                            to: Route::Contact {},
-                            class: "btn btn-secondary",
-                            "Get In Touch"
-                        }
+                    div { class: "hero-buttons",
+                        Link { to: Route::Projects {}, class: "btn btn-primary", "View My Work" }
+                        Link { to: Route::Contact {}, class: "btn btn-secondary", "Get In Touch" }
                     }
                 }
-                div {
-                    class: "hero-image",
+                div { class: "hero-image",
                     img { src: PROFILE_IMAGE, alt: "Gitan Elyon" }
                 }
             }
         }
         // ABOUT --------------------------------------------------------------
-        section { id: "about-section", class: "home-section about-center home-about",
+        section {
+            id: "about-section",
+            class: "home-section about-center home-about",
             h2 { class: "section-title", "About Me" }
-            div { class: "glass-bw about-card inner",
+            div { class: "inner",
                 div { class: "about-grid",
-                    div { class: "gen-info",
+                    div { class: "glass-bw gen-info",
                         h3 { "Who Am I?" }
-                        p { "I'm a passionate software engineer with a strong background in full‑stack and systems development. I build efficient, user‑centric applications and explore ways to push performance and reliability." }
-                        p { "My journey started with solving everyday problems. Since then I've worked across several languages and platforms refining a pragmatic mindset toward shipping maintainable, high‑quality software." }
+                        p {
+                            "I'm a passionate software engineer with a strong background in full‑stack and systems development. I build efficient, user‑centric applications and explore ways to push performance and reliability."
+                        }
+                        p {
+                            "My journey started with solving everyday problems. Since then I've worked across several languages and platforms refining a pragmatic mindset toward shipping maintainable, high‑quality software."
+                        }
                     }
-                    div { class: "current-work",
+                    div { class: "glass-bw current-work",
                         h3 { "Currently Working On" }
                         h4 { "Papyr" }
-                        p { "A lightweight, real‑time markdown editor component designed to seamlessly integrate into web apps with a focus on speed and customization." }
+                        p {
+                            "A lightweight, real‑time markdown editor component designed to seamlessly integrate into web apps with a focus on speed and customization."
+                        }
                         p { "Demo coming soon!" }
-                        a { href: "https://github.com/gitanelyon/papyr", target: "_blank", class: "link", "GitHub ↗" }
+                        a {
+                            href: "https://github.com/gitanelyon/papyr",
+                            target: "_blank",
+                            class: "link",
+                            "GitHub ↗"
+                        }
                         div { class: "tags",
                             span { "TypeScript" }
                             span { "HTML" }
@@ -500,7 +224,7 @@ pub fn Home() -> Element {
                             span { "Markdown" }
                         }
                     }
-                    div { class: "about-languages",
+                    div { class: "glass-bw about-languages",
                         h3 { "Main Technologies" }
                         // Vertical list of main languages - expand on click only
                         div { class: "lang-list",
@@ -509,11 +233,14 @@ pub fn Home() -> Element {
                                     let lang = &main_langs[sel_idx];
                                     let skill_opt = skill_sections[0].1.iter().find(|s| s.name == lang.name);
                                     let hours = skill_opt.map(|s| s.hours).unwrap_or(0);
-                                    let projects: Vec<&'static str> = skill_opt.map(|s| s.projects.clone()).unwrap_or_default();
+                                    let projects: Vec<&'static str> = skill_opt
+                                        .map(|s| s.projects.clone())
+                                        .unwrap_or_default();
                                     let projects_count = projects.len();
-
                                     rsx! {
-                                        div { class: "lang-expanded", style: "--glow: {lang.color};",
+                                        div {
+                                            class: "lang-expanded",
+                                            style: "--glow: {lang.color};",
                                             onclick: move |_| selected_lang_about.set(None),
                                             h4 { "{lang.name} | {lang.brief}" }
                                             p { "{lang.long}" }
@@ -521,18 +248,22 @@ pub fn Home() -> Element {
                                             if !lang.tools.is_empty() {
                                                 p { class: "tools",
                                                     b { "Tools: " }
-                                                    for (i, t) in lang.tools.iter().enumerate() {
+                                                    for (i , t) in lang.tools.iter().enumerate() {
                                                         span { "{t}" }
-                                                        if i < lang.tools.len()-1 { span { ", " } }
+                                                        if i < lang.tools.len() - 1 {
+                                                            span { ", " }
+                                                        }
                                                     }
                                                 }
                                             }
                                             if !projects.is_empty() {
                                                 p { class: "projects",
                                                     b { "Projects: " }
-                                                    for (i, prj) in projects.iter().enumerate() {
+                                                    for (i , prj) in projects.iter().enumerate() {
                                                         span { "{prj}" }
-                                                        if i < projects.len()-1 { span { ", " } }
+                                                        if i < projects.len() - 1 {
+                                                            span { ", " }
+                                                        }
                                                     }
                                                 }
                                             }
@@ -541,8 +272,10 @@ pub fn Home() -> Element {
                                     }
                                 }
                             } else {
-                                for (idx, lang) in main_langs.iter().enumerate() {
-                                    div { class: "lang-row", style: "--glow: {lang.color};",
+                                for (idx , lang) in main_langs.iter().enumerate() {
+                                    div {
+                                        class: "lang-row",
+                                        style: "--glow: {lang.color};",
                                         onclick: move |_| selected_lang_about.set(Some(idx)),
                                         span { class: "lang-name", "{lang.name}" }
                                         span { class: "lang-sep", " | " }
@@ -560,7 +293,7 @@ pub fn Home() -> Element {
             h2 { class: "section-title", "Skills" }
             // Tabs for skill sections
             div { class: "skills-tabs",
-                for (i, (title, _)) in skill_sections.iter().enumerate() {
+                for (i , (title , _)) in skill_sections.iter().enumerate() {
                     {
                         let is_active = i == current_section();
                         rsx! {
@@ -569,7 +302,11 @@ pub fn Home() -> Element {
                                 onclick: move |_| {
                                     let cur = current_section();
                                     if i != cur {
-                                        if i > cur { slide_direction.set("slide-right"); } else { slide_direction.set("slide-left"); }
+                                        if i > cur {
+                                            slide_direction.set("slide-right");
+                                        } else {
+                                            slide_direction.set("slide-left");
+                                        }
                                         current_section.set(i);
                                         selected_skill.set(None);
                                     }
@@ -588,7 +325,7 @@ pub fn Home() -> Element {
                     div { class: "skills-inner",
                         // Icon row with overlapping similar languages
                         div { class: "skills-icon-row",
-                            for (idx, skill) in skill_sections[current_section()].1.iter().enumerate() {
+                            for (idx , skill) in skill_sections[current_section()].1.iter().enumerate() {
                                 {
                                     let is_overlap = match skill.name {
                                         "CSS" | "TypeScript" | "C++" => true,
@@ -597,8 +334,7 @@ pub fn Home() -> Element {
                                     let is_selected = selected_skill() == Some(idx);
 
                                     rsx! {
-                                        div {
-                                            class: if is_overlap { "skill-icon-wrap overlap" } else { "skill-icon-wrap" },
+                                        div { class: if is_overlap { "skill-icon-wrap overlap" } else { "skill-icon-wrap" },
                                             div {
                                                 class: if is_selected { "skill-icon selected" } else { "skill-icon" },
                                                 "data-skill": "{skill.name}",
@@ -652,88 +388,62 @@ pub fn Home() -> Element {
                                                     "JavaScript" => {
                                                         if let Some(next_skill) = skills.get(i + 1) {
                                                             if next_skill.name == "TypeScript" {
-                                                                groups.push((
-                                                                    "JavaScript / TypeScript".to_string(),
-                                                                    vec![i, i + 1],
-                                                                    skill.hours + next_skill.hours,
-
-                                                                ));
+                                                                groups
+                                                                    .push((
+                                                                        "JavaScript / TypeScript".to_string(),
+                                                                        vec![i, i + 1],
+                                                                        skill.hours + next_skill.hours,
+                                                                    ));
                                                                 i += 2;
                                                                 continue;
                                                             }
                                                         }
-                                                        groups.push((
-                                                            skill.name.to_string(),
-                                                            vec![i],
-                                                            skill.hours,
-
-                                                        ));
+                                                        groups.push((skill.name.to_string(), vec![i], skill.hours));
                                                         i += 1;
                                                     }
                                                     "HTML" => {
                                                         if let Some(next_skill) = skills.get(i + 1) {
                                                             if next_skill.name == "CSS" {
-                                                                groups.push((
-                                                                    "HTML / CSS".to_string(),
-                                                                    vec![i, i + 1],
-                                                                    skill.hours + next_skill.hours,
-
-                                                                ));
+                                                                groups
+                                                                    .push((
+                                                                        "HTML / CSS".to_string(),
+                                                                        vec![i, i + 1],
+                                                                        skill.hours + next_skill.hours,
+                                                                    ));
                                                                 i += 2;
                                                                 continue;
                                                             }
                                                         }
-                                                        groups.push((
-                                                            skill.name.to_string(),
-                                                            vec![i],
-                                                            skill.hours,
-
-                                                        ));
+                                                        groups.push((skill.name.to_string(), vec![i], skill.hours));
                                                         i += 1;
                                                     }
                                                     "C" => {
                                                         if let Some(next_skill) = skills.get(i + 1) {
                                                             if next_skill.name == "C++" {
-                                                                groups.push((
-                                                                    "C / C++".to_string(),
-                                                                    vec![i, i + 1],
-                                                                    skill.hours + next_skill.hours,
-
-                                                                ));
+                                                                groups
+                                                                    .push((
+                                                                        "C / C++".to_string(),
+                                                                        vec![i, i + 1],
+                                                                        skill.hours + next_skill.hours,
+                                                                    ));
                                                                 i += 2;
                                                                 continue;
                                                             }
                                                         }
-                                                        groups.push((
-                                                            skill.name.to_string(),
-                                                            vec![i],
-                                                            skill.hours,
-
-                                                        ));
+                                                        groups.push((skill.name.to_string(), vec![i], skill.hours));
                                                         i += 1;
                                                     }
                                                     _ => {
-                                                        groups.push((
-                                                            skill.name.to_string(),
-                                                            vec![i],
-                                                            skill.hours,
-
-                                                        ));
+                                                        groups.push((skill.name.to_string(), vec![i], skill.hours));
                                                         i += 1;
                                                     }
                                                 }
                                             }
                                         } else {
                                             for (idx, skill) in skills.iter().enumerate() {
-                                                groups.push((
-                                                    skill.name.to_string(),
-                                                    vec![idx],
-                                                    skill.hours,
-
-                                                ));
+                                                groups.push((skill.name.to_string(), vec![idx], skill.hours));
                                             }
                                         }
-
                                         let max_hours = groups.iter().map(|(_, _, hours)| *hours).max().unwrap_or(1);
                                         let mut bar_graph_class = String::from("bar-graph");
                                         if section_idx == 0 {
@@ -742,15 +452,19 @@ pub fn Home() -> Element {
                                         if hovered_idx.is_some() {
                                             bar_graph_class.push_str(" hovering");
                                         }
-
                                         rsx! {
                                             div { class: "{bar_graph_class}",
-                                                for (idx, (label, skill_indices, hours)) in groups.iter().enumerate() {
+                                                for (idx , (label , skill_indices , hours)) in groups.iter().enumerate() {
                                                     {
                                                         let percentage = ((*hours as f64 / max_hours as f64) * 100.0).round() as u32;
-                                                        let is_active = hovered_idx.map(|hover_idx| skill_indices.contains(&hover_idx)).unwrap_or(true);
-                                                        let data_skill = skill_indices.iter().map(|&skill_idx| skills[skill_idx].name).collect::<Vec<_>>().join(",");
-
+                                                        let is_active = hovered_idx
+                                                            .map(|hover_idx| skill_indices.contains(&hover_idx))
+                                                            .unwrap_or(true);
+                                                        let data_skill = skill_indices
+                                                            .iter()
+                                                            .map(|&skill_idx| skills[skill_idx].name)
+                                                            .collect::<Vec<_>>()
+                                                            .join(",");
                                                         rsx! {
                                                             div {
                                                                 class: "bar-item",
@@ -783,7 +497,11 @@ pub fn Home() -> Element {
                                 class: if i == current_section() { "dot active" } else { "dot" },
                                 onclick: move |_| {
                                     let cur = current_section();
-                                    if i > cur { slide_direction.set("slide-right"); } else if i < cur { slide_direction.set("slide-left"); }
+                                    if i > cur {
+                                        slide_direction.set("slide-right");
+                                    } else {
+                                        slide_direction.set("slide-left");
+                                    }
                                     current_section.set(i);
                                     selected_skill.set(None);
                                 },
@@ -798,44 +516,66 @@ pub fn Home() -> Element {
         // PROJECTS -----------------------------------------------------------
         section { id: "projects-section", class: "home-section projects-flex",
             h2 { "Featured Projects" }
-            div { class: "projects-row",
-                if expanded_project().is_none() {
-                    // Collapsed: show 3 side-by-side
-                    div { class: "project-card-bw", onclick: toggle_project(0),
-                        h3 { "Minos" }
-                        p { class: "brief", "Real‑time AI Tetris player" }
-                    }
-                    div { class: "project-card-bw", onclick: toggle_project(1),
-                        h3 { "Papyr" }
-                        p { class: "brief", "Real‑time markdown editor" }
-                    }
-                    div { class: "project-card-bw", onclick: toggle_project(2),
-                        h3 { "Rust Liquidator" }
-                        p { class: "brief", "High‑performance trading bot" }
-                    }
-                } else if expanded_project() == Some(0) {
-                    // Expanded: show only Minos
-                    div { class: "project-card-bw expanded", onclick: toggle_project(0),
-                        h3 { "Minos" }
-                        p { class: "detail", "AI that plays Tetris in real time combining Python screen parsing with Rust computation for optimal moves." }
-                        div { class: "tags", span { "Rust" } span { "Python" } span { "AI" } span { "ML" } }
-                        a { href: "https://github.com/GitanElyon/minos", target: "_blank", class: "link", "GitHub ↗" }
-                    }
-                } else if expanded_project() == Some(1) {
-                    // Expanded: show only Papyr
-                    div { class: "project-card-bw expanded", onclick: toggle_project(1),
-                        h3 { "Papyr" }
-                        p { class: "detail", "A real‑time markdown editor focused on speed, simplicity and staying organized across notes." }
-                        div { class: "tags", span { "TypeScript" } span { "JavaScript" } span { "Markdown" } span { "CSS" } }
-                        a { href: "https://github.com/GitanElyon/papyr", target: "_blank", class: "link", "GitHub ↗" }
-                    }
-                } else {
-                    // Expanded: show only Rust Liquidator
-                    div { class: "project-card-bw expanded", onclick: toggle_project(2),
-                        h3 { "Rust Liquidator" }
-                        p { class: "detail", "High‑performance algorithmic trading bot leveraging async Rust, orderbook streaming & rapid decision logic." }
-                        div { class: "tags", span { "Rust" } span { "Crypto" } span { "Suilend" } span { "Database" } }
-                        p { class: "note", "Private Repository" }
+            p { class: "click-hint", "Click to expand" }
+            div {
+                class: "projects-row",
+                onmouseleave: move |_| expanded_project.set(None),
+                {
+                    let projects_read = projects.read();
+                    let featured: Vec<_> = projects_read.iter().filter(|p| p.is_featured).collect();
+                    let total = featured.len();
+
+                    rsx! {
+                        for (i , project) in featured.into_iter().enumerate() {
+                            {
+                                let id = project.id;
+                                let is_expanded = expanded_project().as_deref() == Some(id);
+                                let is_faded = expanded_project().is_some() && !is_expanded;
+
+                                rsx! {
+                                    div {
+                                        class: if is_expanded { "featured-card expanded" } else if is_faded { "featured-card faded" } else { "featured-card" },
+                                        style: "--glow-color: {project.glow_color}; --i: {i}; --total: {total};",
+                                        onclick: toggle_project(id),
+
+                                        // Brief Content
+                                        div { class: "project-content-brief",
+                                            h3 { "{project.name}" }
+                                            p { class: "brief", "{project.brief}" }
+                                        }
+
+                                        // Full Content
+                                        div { class: "project-content-full",
+                                            h3 { "{project.name}" }
+
+                                            for para in &project.detailed_description {
+                                                p { class: "detail", "{para}" }
+                                            }
+
+                                            div { class: "tags",
+                                                for tech in &project.technologies {
+                                                    span { "{tech}" }
+                                                }
+                                            }
+
+                                            if let Some(url) = project.github_url {
+                                                a { href: "{url}", target: "_blank", class: "link", "GitHub ↗" }
+                                            }
+
+                                            if let Some(url) = project.demo_url {
+                                                a { href: "{url}", target: "_blank", class: "link", "Live Demo ↗" }
+                                            }
+
+                                            if project.private {
+                                                p { class: "note", "Private Repository" }
+                                            }
+
+                                            p { class: "collapse-hint", "Click to collapse" }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -845,10 +585,26 @@ pub fn Home() -> Element {
         section { id: "career-section", class: "home-section career-pane",
             h2 { "Career" }
             div { class: "timeline glass-bw",
-                div { class: "job", h3 { "Full Stack Developer" } p { class: "meta", "NexSys • 2025 - Present" } p { "Rust + Tauri + Dioxus apps, CI/CD, agile collaboration." } }
-                div { class: "job", h3 { "Software Engineer" } p { class: "meta", "Freelance • 2022 - Present" } p { "Delivered solo full‑stack & tooling projects solving practical problems." } }
-                div { class: "job", h3 { "Backend Infrastructure Engineer" } p { class: "meta", "Mind Over Machines • 2024" } p { "Optimized client systems & accelerated development pathways." } }
-                div { class: "job", h3 { "Backend Engineer" } p { class: "meta", "Gulp Data • 2023" } p { "Python backend maintenance, AI search improvements." } }
+                div { class: "job",
+                    h3 { "Full Stack Developer" }
+                    p { class: "meta", "NexSys • 2025 - Present" }
+                    p { "Rust + Tauri + Dioxus apps, CI/CD, agile collaboration." }
+                }
+                div { class: "job",
+                    h3 { "Software Engineer" }
+                    p { class: "meta", "Freelance • 2022 - Present" }
+                    p { "Delivered solo full‑stack & tooling projects solving practical problems." }
+                }
+                div { class: "job",
+                    h3 { "Backend Infrastructure Engineer" }
+                    p { class: "meta", "Mind Over Machines • 2024" }
+                    p { "Optimized client systems & accelerated development pathways." }
+                }
+                div { class: "job",
+                    h3 { "Backend Engineer" }
+                    p { class: "meta", "Gulp Data • 2023" }
+                    p { "Python backend maintenance, AI search improvements." }
+                }
             }
         }
 
@@ -883,8 +639,16 @@ pub fn Home() -> Element {
                         div { class: "social-links",
                             h4 { "Follow Me" }
                             div { class: "social-icons",
-                                a { href: "https://github.com/GitanElyon", target: "_blank", "GitHub ↗"}
-                                a { href: "https://linkedin.com/in/gitaneylon", target: "_blank", "LinkedIn" }
+                                a {
+                                    href: "https://github.com/GitanElyon",
+                                    target: "_blank",
+                                    "GitHub ↗"
+                                }
+                                a {
+                                    href: "https://linkedin.com/in/gitaneylon",
+                                    target: "_blank",
+                                    "LinkedIn"
+                                }
                             }
                         }
 
@@ -919,9 +683,7 @@ pub fn Home() -> Element {
                                 }
                             },
                             _ => rsx! {
-                                form {
-                                    class: "contact-form",
-                                    onsubmit: handle_submit,
+                                form { class: "contact-form", onsubmit: handle_submit,
 
                                     div { class: "form-group",
                                         label { r#for: "name", "Name" }
@@ -970,7 +732,7 @@ pub fn Home() -> Element {
                                         }
                                     }
                                 }
-                            }
+                            },
                         }
                     }
                 }

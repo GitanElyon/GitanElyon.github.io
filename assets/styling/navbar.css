@@ -1,21 +1,25 @@
 #navbar {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 1000px;
   z-index: 1000;
-  background: rgba(20, 20, 20, 0.5);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(160, 160, 160, 0.3);
-  padding: 1rem 2rem;
+  background: rgba(20, 20, 20, 0.65);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+  padding: 0.8rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
 }
 
 .navbar-hidden {
-  transform: translateY(-100%);
+  transform: translateY(-200%) translateX(-50%);
 }
 
 .nav-brand a {

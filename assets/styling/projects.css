@@ -1,14 +1,110 @@
 /* Projects Page */
 #projects { padding: 5rem 0; }
-#projects h1 { text-align: center; font-size: 3rem; margin-bottom: 3rem; }
-.projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; }
-.project-card { background: rgba(80, 80, 80, 0.1); border: 1px solid rgba(160, 160, 160, 0.3); border-radius: 16px; overflow: hidden; transition: all 0.3s ease; backdrop-filter: blur(10px); }
-.project-card:hover { transform: translateY(-10px); border-color: #cccccc; box-shadow: 0 20px 40px rgba(160, 160, 160, 0.3); }
-.project-content { padding: 2rem; }
-.project-content h3 { font-size: 1.5rem; margin-bottom: 1rem; color: #cccccc; }
-.project-content p { color: #94a3b8; margin-bottom: 1.5rem; }
-.tech-stack { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
-.tech-tag { background: rgba(160, 160, 160, 0.2); color: #cccccc; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 500; }
-.project-links { display: flex; gap: 1rem; }
-.project-links a { color: #cccccc; text-decoration: none; font-weight: 600; transition: color 0.3s ease; }
-.project-links a:hover { color: #999999; }
+#projects h1 { text-align: center; font-size: 3rem; margin-bottom: 0.75rem; }
+.click-hint { color: rgba(255,255,255,0.6); font-style: italic; font-size: 0.9rem; text-align: center; margin-bottom: 2.5rem; }
+
+.projects-list {
+	width: min(1200px, 95vw);
+	margin: 0 auto;
+	display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+	gap: 1.5rem;
+}
+
+.project-tile { 
+	background: rgba(255,255,255,0.06); 
+	border: 1px solid rgba(255,255,255,0.18); 
+	backdrop-filter: blur(10px); 
+	border-radius: 16px; 
+	padding: 1.75rem; 
+	cursor: pointer; 
+	transition: transform 0.3s ease, border 0.3s ease, box-shadow 0.3s ease; 
+	display: flex; 
+	flex-direction: column; 
+	justify-content: flex-start; 
+	overflow: hidden;
+	position: relative;
+	height: 280px;
+}
+
+.project-tile:hover { 
+	transform: translateY(-5px); 
+	border-color: var(--glow-color, rgba(255,255,255,0.5)); 
+	box-shadow: 0 0 25px var(--glow-color, rgba(255,255,255,0.0)), 0 0 50px -10px var(--glow-color, rgba(79, 70, 229, 0.4)); 
+}
+
+/* Modal Overlay Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+    background: rgba(20, 20, 25, 0.95);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 2.5rem;
+    width: min(900px, 90vw);
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 0 40px var(--glow-color, rgba(255,255,255,0.1));
+    animation: scaleUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border-color: var(--glow-color);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Modal Internal Content */
+.modal-content h3 { font-size: 2rem; margin-bottom: 0.5rem; color: #fff; }
+.modal-content .detail { color: #d1d5db; margin: 0.75rem 0; line-height: 1.7; font-size: 1.05rem; }
+.modal-content .tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 1.5rem 0; }
+.modal-content .tags span { font-size: 0.9rem; padding: 0.4rem 0.8rem; border-radius: 999px; border: 1px solid rgba(255,255,255,0.25); color: #e5e7eb; }
+.modal-content .link { display: inline-block; margin-right: 1.5rem; color: #fff; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.4); padding-bottom: 2px; transition: border-color 0.2s; }
+.modal-content .link:hover { border-color: #fff; }
+.modal-content .note { color: #9ca3af; font-style: italic; margin-top: 1rem; }
+
+.modal-close-btn {
+	position: absolute;
+	top: 1.5rem;
+	right: 1.5rem;
+	background: rgba(255,255,255,0.1);
+	border: none;
+	color: #fff;
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+    font-size: 1.2rem;
+    transition: background 0.2s;
+}
+
+.modal-close-btn:hover { background: rgba(255,255,255,0.25); }
+
+/* Reuse brevity styles for tiles */
+.project-content-brief h3 { color: #fff; font-size: 1.4rem; margin-bottom: .5rem; }
+.project-content-brief .brief { color: #d1d5db; }
+
+
+
+.close-btn:hover { background: rgba(255,255,255,0.2); }

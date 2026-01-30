@@ -14,7 +14,7 @@ pub fn About() -> Element {
                 div {
                     class: "about-content",
                     div {
-                        class: "about-text",
+                        class: "glass-bw about-card",
                         p {
                             "I'm a passionate software engineer with a strong background in full-stack development.
                             I love working with cutting-edge technologies and building applications that make a difference."
@@ -23,6 +23,9 @@ pub fn About() -> Element {
                             "My journey in software development started with a desire to find solutions to problems I find in everyday life.
                             Over the years, I've honed my skills in various programming languages and frameworks, while maintaining a focus on performance and user experience."
                         }
+                    }
+                    div {
+                        class: "glass-bw about-card",
                         h2 { "What I Do" }
                         ul {
                             li { "Full-stack web application development" }
@@ -30,6 +33,9 @@ pub fn About() -> Element {
                             li { "Freelancing for anyone who has an idea" }
                             li { "Open source contributions" }
                         }
+                    }
+                    div {
+                        class: "glass-bw about-card",
                         h2 { "Main Technologies I Use" }
                         ul {
                             li { "Rust - My goto language for building high-performance applications" }
@@ -37,6 +43,9 @@ pub fn About() -> Element {
                             li { "Go - Most of my freelancing work was done using Go because of simple yet fast it is" }
                             li { "Python - My typical choice when just prototyping, building a quick script or teaching a friend to code" }
                         }
+                    }
+                    div {
+                        class: "glass-bw about-card",
                         h2 { "When I'm Not Coding" }
                         p {
                             "When I'm not coding, I enjoy rock climbing, studying the newest technologies and building all sorts of little computers.
