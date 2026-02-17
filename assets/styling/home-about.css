@@ -20,6 +20,7 @@
 .home-about .gen-info h3 { color: #ffffff; font-size: 1.25rem; margin-bottom: .75rem; letter-spacing: .5px; text-transform: uppercase; opacity: .9; }
 .home-about .about-languages > div { margin-bottom: .6rem; }
 .home-about .about-languages > div:last-child { margin-bottom: 0; }
+.home-about .about-languages .expand-note { margin: 0 0 .65rem; font-size: .8rem; color: #a5b4fc; opacity: .9; letter-spacing: .02em; }
 
 /* Favorite Languages */
 .home-about .about-languages h3, .home-about .about-facts h3, .home-about .about-values h3 { color: #ffffff; font-size: 1.15rem; margin-bottom: .75rem; letter-spacing: .5px; text-transform: uppercase; opacity: .85; }
@@ -40,7 +41,9 @@
 /* New: Main Technologies vertical list */
 .home-about .about-languages .lang-list { display: flex; flex-direction: column; gap: .5rem; }
 .home-about .about-languages .lang-row { display: flex; align-items: center; padding: .6rem .75rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12); border-radius: .5rem; cursor: pointer; transition: background .2s ease, border-color .2s ease, transform .15s ease; color: #e5e7eb; }
+.home-about .about-languages .lang-row::after { content: "↗"; margin-left: auto; opacity: .65; transition: transform .2s ease, opacity .2s ease; }
 .home-about .about-languages .lang-row:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.22); transform: translateX(2px); box-shadow: 0 0 0 0 rgba(0,0,0,0), 0 0 18px -2px var(--glow, rgba(255,255,255,0.18)); }
+.home-about .about-languages .lang-row:hover::after { opacity: 1; transform: translateX(2px); }
 .home-about .about-languages .lang-name { color: #fff; font-weight: 600; }
 .home-about .about-languages .lang-sep { margin: 0 .5rem; opacity: .45; }
 .home-about .about-languages .lang-brief { color: #cbd5e1; opacity: .9; }
@@ -56,9 +59,11 @@
 /* Responsive tweaks */
 @media (max-width: 960px) {
   .home-about .about-card { padding: 2rem 1.5rem; }
-  .home-about .about-grid { gap: 1.5rem; grid-template-columns: 1fr; grid-template-areas: "gen" "work" "langs"; }
+  .home-about .about-grid { gap: 1.5rem; grid-template-columns: 1fr; grid-template-areas: "gen" "work" "langs"; padding: 0 .75rem; }
 }
 @media (max-width: 640px) {
   .home-about .about-card { padding: 1.75rem 1.25rem; }
   .home-about .current-work h4 { font-size: 1.2rem; }
+  .home-about .about-grid { padding: 0 .55rem; }
+  .home-about .about-languages .expand-note { font-size: .74rem; margin-bottom: .5rem; }
 }

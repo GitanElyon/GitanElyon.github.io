@@ -172,7 +172,10 @@ pub fn Home() -> Element {
         section { id: "hero",
             div { class: "hero-content",
                 div { class: "hero-text",
-                    h1 { "Gitan Elyon Mandell-Balogh" }
+                    h1 { class: "hero-name",
+                        span { class: "name-line", "Gitan Elyon" }
+                        span { class: "name-line", "Mandell-Balogh" }
+                    }
                     h2 { "Software Engineer & Full-Stack Developer" }
                     p {
                         "Passionate about creating innovative solutions with modern web technologies.
@@ -226,6 +229,7 @@ pub fn Home() -> Element {
                     }
                     div { class: "glass-bw about-languages",
                         h3 { "Main Technologies" }
+                        p { class: "expand-note", "Tap any technology to expand" }
                         // Vertical list of main languages - expand on click only
                         div { class: "lang-list",
                             if let Some(sel_idx) = selected_lang_about() {
@@ -348,6 +352,137 @@ pub fn Home() -> Element {
                                                     }
                                                 },
                                                 img { src: skill.icon, alt: "{skill.name}" }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // Mobile: stacked list with inline progress charts (grouped like desktop)
+                        {
+                            let section_idx = current_section();
+                            let skills = &skill_sections[section_idx].1;
+
+                            // Build groups (same logic as desktop bar graph)
+                            let mut groups: Vec<(String, Vec<usize>)> = Vec::new();
+                            if section_idx == 0 {
+                                let mut i = 0;
+                                while i < skills.len() {
+                                    let skill = &skills[i];
+                                    match skill.name {
+                                        "JavaScript" => {
+                                            if let Some(next_skill) = skills.get(i + 1) {
+                                                if next_skill.name == "TypeScript" {
+                                                    groups.push(("JS / TS".to_string(), vec![i, i + 1]));
+                                                    i += 2;
+                                                    continue;
+                                                }
+                                            }
+                                            groups.push((skill.name.to_string(), vec![i]));
+                                            i += 1;
+                                        }
+                                        "HTML" => {
+                                            if let Some(next_skill) = skills.get(i + 1) {
+                                                if next_skill.name == "CSS" {
+                                                    groups.push(("HTML / CSS".to_string(), vec![i, i + 1]));
+                                                    i += 2;
+                                                    continue;
+                                                }
+                                            }
+                                            groups.push((skill.name.to_string(), vec![i]));
+                                            i += 1;
+                                        }
+                                        "C" => {
+                                            if let Some(next_skill) = skills.get(i + 1) {
+                                                if next_skill.name == "C++" {
+                                                    groups.push(("C / C++".to_string(), vec![i, i + 1]));
+                                                    i += 2;
+                                                    continue;
+                                                }
+                                            }
+                                            groups.push((skill.name.to_string(), vec![i]));
+                                            i += 1;
+                                        }
+                                        _ => {
+                                            groups.push((skill.name.to_string(), vec![i]));
+                                            i += 1;
+                                        }
+                                    }
+                                }
+                            } else {
+                                for (idx, skill) in skills.iter().enumerate() {
+                                    groups.push((skill.name.to_string(), vec![idx]));
+                                }
+                            }
+
+                            // Calculate max hours from grouped totals
+                            let max_hours = groups
+                                .iter()
+                                .map(|(_, indices)| {
+                                    indices.iter().map(|&idx| skills[idx].hours).sum::<u32>()
+                                })
+                                .max()
+                                .unwrap_or(1);
+                            rsx! { // Collect all projects from all skills in the group
+                                div { class: "skills-mobile-list",
+                                    for (group_idx , (label , skill_indices)) in groups.iter().enumerate() {
+
+                                        {
+                                            // Combined hours for the group
+                                            let combined_hours: u32 = skill_indices
+                                                .iter() // Use first skill's color for the group  Use first skill's color for the group
+                                                .map(|&idx| skills[idx].hours)
+                                                .sum(); // Collect all projects from all skills in the group  Collect all projects from all skills in the group
+                                            let percentage = ((combined_hours as f64 / max_hours as f64) * 100.0).round()
+                                                as u32;
+                                            let primary_skill = &skills[skill_indices[0]];
+                                            let skill_glow = skill_color(primary_skill.name);
+                                            let is_selected = selected_skill() == Some(group_idx);
+                                            let all_projects: Vec<&'static str> = skill_indices
+                                                .iter()
+                                                .flat_map(|&idx| skills[idx].projects.clone())
+                                                .collect();
+                                            let project_count = all_projects.len();
+                                            rsx! {
+                                                div {
+                                                    class: if is_selected { "mobile-skill-row selected" } else { "mobile-skill-row" },
+                                                    onclick: move |_| {
+                                                        if selected_skill() == Some(group_idx) {
+                                                            selected_skill.set(None);
+                                                        } else {
+                                                            selected_skill.set(Some(group_idx));
+                                                        }
+                                                    },
+                                                    div { class: "mobile-skill-meta",
+                                                        div { class: "mobile-skill-icons",
+                                                            for & idx in skill_indices.iter() {
+                                                                img { src: skills[idx].icon, alt: "{skills[idx].name}" }
+                                                            }
+                                                        }
+                                                        span { class: "mobile-skill-name", "{label}" }
+                                                    }
+                                                    div { class: "mobile-skill-chart",
+                                                        div { class: "mobile-skill-track",
+                                                            div {
+                                                                class: "mobile-skill-fill",
+                                                                style: "width: {percentage}%; --skill-color: {skill_glow};",
+                                                            }
+                                                        }
+                                                        span { class: "mobile-skill-hours", "{combined_hours}h" }
+                                                    }
+
+                                                    if is_selected {
+                                                        div { class: "mobile-skill-projects",
+                                                            span { class: "mobile-skill-project-header", "{project_count} projects:" }
+                                                            div { class: "mobile-skill-pills",
+                                                                for project in all_projects.iter() {
+                                                                    span { class: "mobile-skill-pill", "{project}" }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
                                             }
                                         }
                                     }
@@ -517,9 +652,7 @@ pub fn Home() -> Element {
         section { id: "projects-section", class: "home-section projects-flex",
             h2 { "Featured Projects" }
             p { class: "click-hint", "Click to expand" }
-            div {
-                class: "projects-row",
-                onmouseleave: move |_| expanded_project.set(None),
+            div { class: "projects-row",
                 {
                     let projects_read = projects.read();
                     let featured: Vec<_> = projects_read.iter().filter(|p| p.is_featured).collect();

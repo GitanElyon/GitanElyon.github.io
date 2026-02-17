@@ -17,3 +17,16 @@
 .skill-category h4 { color: #999999; margin-bottom: 0.5rem; }
 .skill-category p { color: #94a3b8; }
 .resume-actions { text-align: center; margin-top: 2rem; }
+
+@media (max-width: 768px) {
+  #resume { padding: 3rem 0; }
+  #resume h1 { font-size: 2rem; margin-bottom: 2rem; }
+  .resume-content { padding: 1.5rem 1rem; margin: 0 0.5rem; border-radius: 12px; }
+  .resume-section h2 { font-size: 1.4rem; }
+  .resume-item h3 { font-size: 1.1rem; }
+  .resume-section { margin-bottom: 2rem; }
+  .skills-categories { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .resume-content { padding: 1.25rem 0.75rem; }
+}

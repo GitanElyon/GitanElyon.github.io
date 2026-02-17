@@ -14,6 +14,11 @@
     overflow: hidden;
     pointer-events: none;
     background: transparent;
+    /* Ensure it always fills the entire viewport */
+    width: 100vw;
+    height: 100vh;
+    min-width: 100%;
+    min-height: 100%;
 }
 
 #hex-background .hex {
@@ -51,9 +56,9 @@
 }
 
 @media (max-width: 768px) {
-    :root { --hex-size: 18px; --hex-gap: 6px; }
+    :root { --hex-size: 20px; --hex-gap: 4px; }
 }
 @media (max-width: 480px) {
-    :root { --hex-size: 14px; --hex-gap: 5px; }
+    :root { --hex-size: 16px; --hex-gap: 3px; }
 }
 /* ----------------------------------------------------------------------- */

@@ -22,25 +22,37 @@ pub fn Navbar() -> Element {
             let Some(document) = window.document() else {
                 return;
             };
-            let Some(nav_element) = document.get_element_by_id("navbar") else {
-                return;
-            };
-            let Ok(nav) = nav_element.dyn_into::<web_sys::HtmlElement>() else {
-                return;
-            };
-
-            let last_scroll = Rc::new(Cell::new(0.0));
+            let last_scroll = Rc::new(Cell::new(window.scroll_y().unwrap_or(0.0).max(0.0)));
+            let is_hidden = Rc::new(Cell::new(false));
             let last_scroll_clone = last_scroll.clone();
-            let nav_clone = nav.clone();
+            let is_hidden_clone = is_hidden.clone();
             let window_clone = window.clone();
+            let document_clone = document.clone();
 
             let closure = Closure::<dyn FnMut(_)>::new(move |_event: web_sys::Event| {
                 let scroll_top = window_clone.scroll_y().unwrap_or(0.0);
-                if scroll_top > last_scroll_clone.get() && scroll_top > 0.0 {
-                    let _ = nav_clone.class_list().add_1("navbar-hidden");
-                } else {
-                    let _ = nav_clone.class_list().remove_1("navbar-hidden");
+                let delta = scroll_top - last_scroll_clone.get();
+
+                let Some(nav_element) = document_clone.get_element_by_id("navbar") else {
+                    last_scroll_clone.set(scroll_top.max(0.0));
+                    return;
+                };
+                let Ok(nav) = nav_element.dyn_into::<web_sys::HtmlElement>() else {
+                    last_scroll_clone.set(scroll_top.max(0.0));
+                    return;
+                };
+
+                if scroll_top <= 16.0 {
+                    let _ = nav.class_list().remove_1("navbar-hidden");
+                    is_hidden_clone.set(false);
+                } else if delta > 2.0 && scroll_top > 72.0 && !is_hidden_clone.get() {
+                    let _ = nav.class_list().add_1("navbar-hidden");
+                    is_hidden_clone.set(true);
+                } else if delta < -2.0 && is_hidden_clone.get() {
+                    let _ = nav.class_list().remove_1("navbar-hidden");
+                    is_hidden_clone.set(false);
                 }
+
                 last_scroll_clone.set(scroll_top.max(0.0));
             });
 
@@ -49,19 +61,54 @@ pub fn Navbar() -> Element {
         });
     }
 
+    let mut menu_open = use_signal(|| false);
+
     rsx! {
         document::Link { rel: "stylesheet", href: NAVBAR_CSS }
 
-        nav { id: "navbar",
+        if menu_open() {
+            div { class: "nav-backdrop", onclick: move |_| menu_open.set(false) }
+        }
+
+        nav { id: "navbar", class: if menu_open() { "menu-open" } else { "" },
             div { class: "nav-brand",
                 Link { to: Route::Home {}, "Gitan Elyon" }
             }
-            div { class: "nav-links",
-                Link { to: Route::Home {}, "Home" }
-                Link { to: Route::About {}, "About" }
-                Link { to: Route::Projects {}, "Projects" }
-                Link { to: Route::Resume {}, "Resume" }
-                Link { to: Route::Contact {}, "Contact" }
+            // Hamburger button for mobile
+            button {
+                class: if menu_open() { "hamburger open" } else { "hamburger" },
+                onclick: move |_| menu_open.set(!menu_open()),
+                "aria-label": "Toggle navigation menu",
+                span { class: "hamburger-line" }
+                span { class: "hamburger-line" }
+                span { class: "hamburger-line" }
+            }
+            div { class: if menu_open() { "nav-links open" } else { "nav-links" },
+                Link {
+                    to: Route::Home {},
+                    onclick: move |_| menu_open.set(false),
+                    "Home"
+                }
+                Link {
+                    to: Route::About {},
+                    onclick: move |_| menu_open.set(false),
+                    "About"
+                }
+                Link {
+                    to: Route::Projects {},
+                    onclick: move |_| menu_open.set(false),
+                    "Projects"
+                }
+                Link {
+                    to: Route::Resume {},
+                    onclick: move |_| menu_open.set(false),
+                    "Resume"
+                }
+                Link {
+                    to: Route::Contact {},
+                    onclick: move |_| menu_open.set(false),
+                    "Contact"
+                }
             }
         }
 

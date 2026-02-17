@@ -50,6 +50,10 @@ fn main() {
 fn App() -> Element {
     rsx! {
         document::Link { rel: "icon", href: FAVICON }
+        document::Meta {
+            name: "viewport",
+            content: "width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes",
+        }
         // Global stylesheets
         document::Link { rel: "stylesheet", href: BASE_CSS }
         document::Link { rel: "stylesheet", href: BACKGROUND_CSS }

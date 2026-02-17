@@ -6,15 +6,19 @@
     box-sizing: border-box;
 }
 
-/* Scrollbars (WebKit) */
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: rgba(10, 14, 26, 0.5); }
-::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #999999 0%, #8b5cf6 100%); border-radius: 4px; transition: all 0.3s ease; }
-::-webkit-scrollbar-thumb:hover { background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); box-shadow: 0 0 10px rgba(139, 92, 246, 0.4); }
-::-webkit-scrollbar-corner { background: rgba(10, 14, 26, 0.5); }
+* {
+    overscroll-behavior-y: none;
+}
 
-/* Scrollbars (Firefox) */
-* { scrollbar-width: thin; scrollbar-color: #8b5cf6 rgba(10, 14, 26, 0.5); overscroll-behavior-y: none; }
+html,
+body {
+    scrollbar-width: none;
+}
+
+*::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+}
 
 body {
     background: linear-gradient(135deg, #0a0e1a 0%, #1a1d29 50%, #2d1b3d 100%);
@@ -22,6 +26,11 @@ body {
     font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
     overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Prevent pull-to-refresh bounce on mobile */
+    overscroll-behavior: none;
 }
 
 .container {
@@ -45,7 +54,7 @@ h2 { font-size: 2.5rem; font-weight: 700; color: #ffffff; line-height: 1.2; }
 .glass-tight { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.22); backdrop-filter: blur(14px); border-radius: 14px; }
 
 /* Buttons --------------------------------------------------------------- */
-.btn { padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s ease; display: inline-block; text-align: center; border: none; cursor: pointer; font-family: inherit; }
+.btn { padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s ease; display: inline-block; text-align: center; border: none; cursor: pointer; font-family: inherit; min-height: 44px; min-width: 44px; -webkit-tap-highlight-color: transparent; }
 .btn-primary { background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); color: #ffffff; }
 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4); }
 .btn-secondary { border: 2px solid #999999; color: #cccccc; background: transparent; }

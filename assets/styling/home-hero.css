@@ -2,6 +2,9 @@
 #hero { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 0; }
 .hero-content { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
 .hero-text h1 { font-size: 3.5rem; font-weight: 700; margin-bottom: 1rem; background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #a855f7 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.hero-name { line-height: 1.05; }
+.hero-name .name-line { display: inline; }
+.hero-name .name-line + .name-line::before { content: " "; }
 .hero-text h2 { font-size: 1.5rem; color: #cccccc; margin-bottom: 1.5rem; font-weight: 400; }
 .hero-text p { font-size: 1.1rem; color: #94a3b8; margin-bottom: 2rem; max-width: 500px; }
 .hero-buttons { display: flex; gap: 1rem; flex-wrap: wrap; }
@@ -10,4 +13,57 @@
 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4); }
 .btn-secondary { border: 2px solid #999999; color: #cccccc; background: transparent; }
 .btn-secondary:hover { background: #999999; color: #ffffff; transform: translateY(-2px); }
+.hero-image { display: flex; justify-content: center; align-items: center; }
 .hero-image img { width: 100%; max-width: 400px; border-radius: 50%; box-shadow: 0 20px 40px rgba(160, 160, 160, 0.3); }
+
+@media (max-width: 768px) {
+	.hero-content {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		gap: 1.5rem;
+		padding: 0 .75rem;
+	}
+
+	/* Profile picture comes first on mobile */
+	.hero-image {
+		order: -1;
+	}
+
+	.hero-image img {
+		max-width: 220px;
+		width: 220px;
+		height: 220px;
+	}
+
+	/* Split name into two lines */
+	.hero-name .name-line {
+		display: block;
+	}
+
+	.hero-name .name-line + .name-line::before {
+		content: "";
+	}
+
+	.hero-text h1 {
+		font-size: 2.2rem;
+		line-height: 1.1;
+	}
+
+	.hero-text h2 {
+		font-size: 1.1rem;
+		margin-bottom: 1rem;
+	}
+
+	.hero-text p {
+		font-size: 0.95rem;
+		max-width: 100%;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.hero-buttons {
+		justify-content: center;
+	}
+}
