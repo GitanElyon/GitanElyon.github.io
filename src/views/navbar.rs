@@ -56,7 +56,11 @@ pub fn Navbar() -> Element {
 
         nav { id: "navbar", class: if menu_open() { "menu-open" } else { "" },
             div { class: "nav-brand",
-                Link { to: Route::Home {}, "Gitan Elyon" }
+                Link {
+                    to: Route::Home {},
+                    onclick: move |_| menu_open.set(false),
+                    "Gitan Elyon"
+                }
             }
             button {
                 class: if menu_open() { "hamburger open" } else { "hamburger" },

@@ -43,6 +43,10 @@ pub fn Contact() -> Element {
                         }
                         div { class: "contact-methods",
                             div { class: "contact-method",
+                                h4 { "Name" }
+                                p { "Gitan /ʒitān/ Elyon Mandell-Balogh" }
+                            }
+                            div { class: "contact-method",
                                 h3 { "Email" }
                                 p { "gitanelyon@gmail.com" }
                             }
@@ -64,7 +68,7 @@ pub fn Contact() -> Element {
                                     "GitHub"
                                 }
                                 a {
-                                    href: "https://linkedin.com/in/gitaneylon",
+                                    href: "https://linkedin.com/in/gitanmb",
                                     target: "_blank",
                                     "LinkedIn"
                                 }

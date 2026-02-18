@@ -186,7 +186,7 @@ pub fn Projects() -> Element {
                 // ── All other projects ──
                 p { class: "hint", "Click any card to see details above" }
                 div { class: "projects-list",
-                    for project in &non_featured {
+                    for project in projects {
                         div {
                             class: if selected() == Some(project.id.to_string()) { "project-tile selected" } else { "project-tile" },
                             style: "--glow-color: {project.glow_color}",

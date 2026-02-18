@@ -122,17 +122,6 @@ fn skill_color(name: &str) -> &'static str {
     }
 }
 
-fn build_skill_groups(skills: &[crate::data::skills::Skill]) -> Vec<Vec<usize>> {
-    let n = skills.len();
-    if n <= 6 {
-        return vec![(0..n).collect()];
-    }
-    let top = (n + 1) / 2;
-    let bottom = n - top;
-    let _ = bottom;
-    vec![(0..top).collect(), (top..n).collect()]
-}
-
 const HEADSHOT: Asset = asset!("/assets/profile.jpg");
 
 // ── Home component ──────────────────────────────────────────────────────
@@ -246,6 +235,7 @@ pub fn Home() -> Element {
                     // Languages card
                     div { class: "glass",
                         h3 { "Languages" }
+                        h4 { class: "hint", "Click a language to see details" }
                         for lang in &languages {
                             div {
                                 class: if expanded_lang() == Some(lang.name.to_string()) { "lang-row active" } else { "lang-row" },
@@ -296,7 +286,6 @@ pub fn Home() -> Element {
             div { class: "carousel-wrapper",
                 {
                     let section = &sections[carousel_idx()];
-                    let groups = build_skill_groups(&section.1);
                     rsx! {
                         div { class: "glass skills-glass",
                             // Tabs
@@ -314,42 +303,7 @@ pub fn Home() -> Element {
                                 }
                             }
 
-                            // Icon rows
-                            for (row_i , row) in groups.iter().enumerate() {
-                                div { class: "skills-icon-row",
-                                    for & idx in row {
-                                        {
-                                            let skill = &section.1[idx];
-                                            let name = skill.name.to_string();
-                                            let color = skill_color(skill.name).to_string();
-                                            rsx! {
-                                                div { class: if row_i > 0 { "skill-icon-wrap overlap" } else { "skill-icon-wrap" },
-                                                    div {
-                                                        class: if selected_skill() == Some(name.clone()) { "skill-icon active" } else { "skill-icon" },
-                                                        onclick: {
-                                                            let n = name.clone();
-                                                            let c = color.clone();
-                                                            move |_| {
-                                                                if selected_skill() == Some(n.clone()) {
-                                                                    selected_skill.set(None);
-                                                                    clear_theme_lock();
-                                                                } else {
-                                                                    selected_skill.set(Some(n.clone()));
-                                                                    set_theme_lock(hex_to_hue(&c));
-                                                                }
-                                                            }
-                                                        },
-                                                        img { src: skill.icon, alt: "{skill.name}" }
-                                                    }
-                                                    span { class: "skill-icon-label", "{skill.name}" }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            // Bar graph — vertical bars for all tabs (CSS flips to horizontal on mobile)
+                            // Skills bars — icon is bound to each matching bar
                             div { class: "bar-graph",
                                 {
                                     let max_h = section.1.iter().map(|s| s.hours).max().unwrap_or(1) as f64;
@@ -361,6 +315,25 @@ pub fn Home() -> Element {
                                                 let color = skill_color(skill.name).to_string();
                                                 rsx! {
                                                     div { class: "bar-item",
+                                                        div { class: "skill-icon-wrap",
+                                                            div {
+                                                                class: if selected_skill() == Some(name.clone()) { "skill-icon active" } else { "skill-icon" },
+                                                                onclick: {
+                                                                    let n = name.clone();
+                                                                    let c = color.clone();
+                                                                    move |_| {
+                                                                        if selected_skill() == Some(n.clone()) {
+                                                                            selected_skill.set(None);
+                                                                            clear_theme_lock();
+                                                                        } else {
+                                                                            selected_skill.set(Some(n.clone()));
+                                                                            set_theme_lock(hex_to_hue(&c));
+                                                                        }
+                                                                    }
+                                                                },
+                                                                img { src: skill.icon, alt: "{skill.name}" }
+                                                            }
+                                                        }
                                                         div {
                                                             class: "bar-wrapper",
                                                             onclick: {
@@ -538,10 +511,43 @@ pub fn Home() -> Element {
                     div { class: "glass",
                         h3 { "Let's Build Something" }
                         p { "Have an idea, a project or an opportunity? I'd love to hear about it." }
-                        ul {
-                            li { "gitanelyon@gmail.com" }
-                            li { "(443)-224-8540" }
-                            li { "Baltimore, MD" }
+                        div { class: "contact-methods",
+                            div { class: "contact-method",
+                                h4 { "Name" }
+                                p { "Gitan /ʒitān/ Elyon Mandell-Balogh" }
+                            }
+                            div { class: "contact-method",
+                                h4 { "Email" }
+                                p { "gitanelyon@gmail.com" }
+                            }
+                            div { class: "contact-method",
+                                h4 { "Phone" }
+                                p { "(443)-224-8540" }
+                            }
+                            div { class: "contact-method",
+                                h4 { "Location" }
+                                p { "Baltimore, MD" }
+                            }
+                        }
+                        div { class: "social-links",
+                            h4 { "Follow Me" }
+                            div { class: "social-icons",
+                                a {
+                                    href: "https://github.com/GitanElyon",
+                                    target: "_blank",
+                                    "GitHub"
+                                }
+                                a {
+                                    href: "https://linkedin.com/in/gitanmb",
+                                    target: "_blank",
+                                    "LinkedIn"
+                                }
+                                a {
+                                    href: "https://instagram.com/gitanelyon",
+                                    target: "_blank",
+                                    "Instagram"
+                                }
+                            }
                         }
                     }
                     div { class: "glass",

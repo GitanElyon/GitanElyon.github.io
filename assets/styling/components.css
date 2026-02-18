@@ -19,7 +19,6 @@
   border: 1px solid var(--glass-border);
   border-radius: 24px;
   backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
   z-index: 1000;
   transition: transform 0.35s ease, opacity 0.35s ease;
 }
@@ -351,7 +350,7 @@
 .bar-graph {
   display: flex;
   justify-content: center;
-  gap: 1rem;
+  gap: 0.75rem;
   align-items: flex-end;
   width: 100%;
 }
@@ -414,13 +413,23 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.35rem;
-  min-width: 56px;
-  flex: 0 1 64px;
+  gap: 0.45rem;
+  min-width: 0;
+  flex: 1 1 0;
+  max-width: 74px;
+}
+.bar-item .skill-icon-wrap {
+  margin: 0;
+  gap: 0;
+}
+.bar-item .skill-icon {
+  width: 48px;
+  height: 48px;
+  padding: 8px;
 }
 .bar-wrapper {
   position: relative;
-  width: 44px;
+  width: min(100%, 52px);
   height: 160px;
   background: rgba(255,255,255,0.05);
   border-radius: 8px 8px 6px 6px;
@@ -460,7 +469,7 @@
   font-size: 0.78rem;
   color: var(--c-text-muted);
   text-align: center;
-  width: 60px;
+  width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -530,13 +539,7 @@
   overflow: hidden;
   transition: all 0.45s cubic-bezier(0.22,1,0.36,1);
   border: 1px solid var(--c-border);
-  background: linear-gradient(
-    160deg,
-    rgba(255,255,255,0.08),
-    rgba(255,255,255,0.025)
-  );
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: var(--glass-blur);
 }
 .featured-card:hover:not(.expanded):not(.faded) {
   transform: translateY(-4px);
@@ -595,7 +598,7 @@
 /* ── Career / Timeline ────────────────────────────────────────────────── */
 .timeline {
   position: relative;
-  padding: 2rem 2rem 2rem 2.5rem;
+  padding: 2rem;
   display: flex;
   flex-direction: column;
   gap: 2rem;
@@ -603,33 +606,22 @@
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
   border-radius: var(--r-card);
   box-shadow: var(--glass-shadow);
 }
-.timeline::before {
-  content: "";
-  position: absolute;
-  left: 1.5rem;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: linear-gradient(to bottom, var(--c-accent-start), transparent);
-  border-radius: 2px;
-}
 .timeline-item {
-  padding-left: 1.5rem;
+  padding-left: 1.25rem;
   position: relative;
 }
 .timeline-item::before {
   content: "";
   position: absolute;
-  left: calc(-1rem - 5px);
-  top: 0.6rem;
-  width: 12px; height: 12px;
+  left: 0;
+  top: 0.58rem;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: var(--c-accent-start);
-  border: 2px solid var(--c-bg);
   box-shadow: 0 0 8px var(--c-accent-glow);
 }
 .timeline-item h3 { font-size: 1.15rem; margin-bottom: 0.15rem; }
@@ -671,6 +663,39 @@
   gap: 1rem;
 }
 .contact-layout .btn-primary { align-self: flex-start; }
+.contact-layout .contact-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  margin-top: 1rem;
+}
+.contact-layout .contact-method h4 {
+  font-size: 0.95rem;
+  margin-bottom: 0.2rem;
+}
+.contact-layout .contact-method p {
+  margin: 0;
+  color: var(--c-text-muted);
+}
+.contact-layout .social-links {
+  margin-top: 1.1rem;
+}
+.contact-layout .social-links h4 {
+  margin-bottom: 0.45rem;
+}
+.contact-layout .social-icons {
+  display: flex;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+.contact-layout .social-icons a {
+  color: var(--c-text-muted);
+  transition: color 0.25s ease;
+  font-size: 0.95rem;
+}
+.contact-layout .social-icons a:hover {
+  color: var(--c-accent-start);
+}
 
 /* ── About Page ───────────────────────────────────────────────────────── */
 #about {
@@ -736,7 +761,6 @@
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
   box-shadow: var(--glass-shadow);
   min-height: 300px;
   cursor: pointer;
@@ -854,7 +878,6 @@
   border: 1px solid var(--glass-border);
   background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
   cursor: pointer;
   transition: all 0.3s ease;
   min-height: 200px;
@@ -957,7 +980,6 @@
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
   border-radius: var(--r-card);
   box-shadow: var(--glass-shadow);
 }
@@ -1086,7 +1108,6 @@
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
   border-radius: var(--r-card);
   box-shadow: var(--glass-shadow);
   padding: 2.5rem;
