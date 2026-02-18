@@ -1,1 +1,0 @@
-// Floating scrollbar component removed.

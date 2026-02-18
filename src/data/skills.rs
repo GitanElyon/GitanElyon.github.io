@@ -5,12 +5,12 @@ const RUST_ICON: Asset = asset!("/icons/langs/rust.svg");
 const GO_ICON: Asset = asset!("/icons/langs/go.svg");
 const PYTHON_ICON: Asset = asset!("/icons/langs/python.svg");
 const JS_ICON: Asset = asset!("/icons/langs/js.svg");
-const TS_ICON: Asset = asset!("/icons/langs/ts.svg");
+const _TS_ICON: Asset = asset!("/icons/langs/ts.svg");
 const JAVA_ICON: Asset = asset!("/icons/langs/java.svg");
 const HTML_ICON: Asset = asset!("/icons/langs/html-5.svg");
-const CSS_ICON: Asset = asset!("/icons/langs/css-3.svg");
+const _CSS_ICON: Asset = asset!("/icons/langs/css-3.svg");
 const C_ICON: Asset = asset!("/icons/langs/c.svg");
-const CPP_ICON: Asset = asset!("/icons/langs/cpp.svg");
+const _CPP_ICON: Asset = asset!("/icons/langs/cpp.svg");
 const CSHARP_ICON: Asset = asset!("/icons/langs/csharp.svg");
 const LUA_ICON: Asset = asset!("/icons/langs/lua.svg");
 
@@ -60,13 +60,10 @@ pub fn get_skill_sections() -> Vec<(&'static str, Vec<Skill>)> {
                 Skill { name: "Rust", icon: RUST_ICON, hours: 300, projects: vec!["Minos", "Portfolio", "Blackjack AI", "Suilend Liquidator", "Flare"] },
                 Skill { name: "Go", icon: GO_ICON, hours: 100, projects: vec!["Backend APIs", "Microservices"] },
                 Skill { name: "Python", icon: PYTHON_ICON, hours: 150, projects: vec!["ML Models", "Data Analysis", "Automation"] },
-                Skill { name: "JavaScript", icon: JS_ICON, hours: 150, projects: vec!["Web Apps", "Node Services"] },
-                Skill { name: "TypeScript", icon: TS_ICON, hours: 100, projects: vec!["Full Stack Apps", "Type-safe APIs"] },
+                Skill { name: "JS/TS", icon: JS_ICON, hours: 250, projects: vec!["Web Apps", "Node Services", "Full Stack Apps", "Type-safe APIs"] },
                 Skill { name: "Java", icon: JAVA_ICON, hours: 80, projects: vec!["Enterprise Apps", "Android"] },
-                Skill { name: "HTML", icon: HTML_ICON, hours: 120, projects: vec!["Web Development"] },
-                Skill { name: "CSS", icon: CSS_ICON, hours: 100, projects: vec!["UI/UX Design"] },
-                Skill { name: "C", icon: C_ICON, hours: 50, projects: vec!["Systems Programming"] },
-                Skill { name: "C++", icon: CPP_ICON, hours: 20, projects: vec!["Game Development"] },
+                Skill { name: "HTML/CSS", icon: HTML_ICON, hours: 220, projects: vec!["Web Development", "UI/UX Design"] },
+                Skill { name: "C/C++", icon: C_ICON, hours: 70, projects: vec!["Systems Programming", "Game Development"] },
                 Skill { name: "C#", icon: CSHARP_ICON, hours: 60, projects: vec![".NET Apps"] },
                 Skill { name: "Lua", icon: LUA_ICON, hours: 30, projects: vec!["Scripting", "Neovim Config"] },
             ],

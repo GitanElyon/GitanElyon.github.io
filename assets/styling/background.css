@@ -26,17 +26,14 @@
     width: calc(var(--hex-size) * 2);
     height: calc(var(--hex-size) * 2);
     transform: translate(-50%, -50%);
-    /* Flat-top hex grid:
-       - Horizontal center step = 1.5 * size (0.75 of width) + gap
-       - Vertical center step   = sqrt(3) * size (full hex height) + gap
-       Odd columns are sunk down by half the vertical step. */
-    left: calc(var(--pad-x, 0px) + var(--col) * (var(--hex-size) * 1.5 + var(--hex-gap)));
-    top: calc(var(--pad-y, 0px) + var(--row) * (var(--hex-size) * 1.732 + var(--hex-gap)));
+    /* Start from negative offsets so hex grid covers the top-left corner */
+    left: calc(-2 * var(--hex-size) + var(--col) * (var(--hex-size) * 1.5 + var(--hex-gap)));
+    top: calc(-2 * var(--hex-size) + var(--row) * (var(--hex-size) * 1.732 + var(--hex-gap)));
 }
 
 #hex-background .hex[data-parity="odd"] {
     top: calc(
-        var(--pad-y, 0px)
+        -2 * var(--hex-size)
         + var(--row) * (var(--hex-size) * 1.732 + var(--hex-gap))
         + (var(--hex-size) * 1.732 + var(--hex-gap)) * 0.5
     );
@@ -61,4 +58,3 @@
 @media (max-width: 480px) {
     :root { --hex-size: 16px; --hex-gap: 3px; }
 }
-/* ----------------------------------------------------------------------- */

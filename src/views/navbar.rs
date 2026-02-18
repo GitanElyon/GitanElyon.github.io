@@ -9,51 +9,37 @@ use wasm_bindgen::closure::Closure;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::JsCast;
 
-const NAVBAR_CSS: Asset = asset!("/assets/styling/navbar.css");
-
 #[component]
 pub fn Navbar() -> Element {
     #[cfg(target_arch = "wasm32")]
     {
         use_effect(move || {
-            let Some(window) = web_sys::window() else {
-                return;
-            };
-            let Some(document) = window.document() else {
-                return;
-            };
+            let Some(window) = web_sys::window() else { return };
+            let Some(document) = window.document() else { return };
             let last_scroll = Rc::new(Cell::new(window.scroll_y().unwrap_or(0.0).max(0.0)));
             let is_hidden = Rc::new(Cell::new(false));
-            let last_scroll_clone = last_scroll.clone();
-            let is_hidden_clone = is_hidden.clone();
-            let window_clone = window.clone();
-            let document_clone = document.clone();
+            let ls = last_scroll.clone();
+            let ih = is_hidden.clone();
+            let w = window.clone();
+            let d = document.clone();
 
-            let closure = Closure::<dyn FnMut(_)>::new(move |_event: web_sys::Event| {
-                let scroll_top = window_clone.scroll_y().unwrap_or(0.0);
-                let delta = scroll_top - last_scroll_clone.get();
+            let closure = Closure::<dyn FnMut(_)>::new(move |_: web_sys::Event| {
+                let y = w.scroll_y().unwrap_or(0.0);
+                let delta = y - ls.get();
+                let Some(el) = d.get_element_by_id("navbar") else { ls.set(y.max(0.0)); return };
+                let Ok(nav) = el.dyn_into::<web_sys::HtmlElement>() else { ls.set(y.max(0.0)); return };
 
-                let Some(nav_element) = document_clone.get_element_by_id("navbar") else {
-                    last_scroll_clone.set(scroll_top.max(0.0));
-                    return;
-                };
-                let Ok(nav) = nav_element.dyn_into::<web_sys::HtmlElement>() else {
-                    last_scroll_clone.set(scroll_top.max(0.0));
-                    return;
-                };
-
-                if scroll_top <= 16.0 {
+                if y <= 16.0 {
                     let _ = nav.class_list().remove_1("navbar-hidden");
-                    is_hidden_clone.set(false);
-                } else if delta > 2.0 && scroll_top > 72.0 && !is_hidden_clone.get() {
+                    ih.set(false);
+                } else if delta > 2.0 && y > 72.0 && !ih.get() {
                     let _ = nav.class_list().add_1("navbar-hidden");
-                    is_hidden_clone.set(true);
-                } else if delta < -2.0 && is_hidden_clone.get() {
+                    ih.set(true);
+                } else if delta < -2.0 && ih.get() {
                     let _ = nav.class_list().remove_1("navbar-hidden");
-                    is_hidden_clone.set(false);
+                    ih.set(false);
                 }
-
-                last_scroll_clone.set(scroll_top.max(0.0));
+                ls.set(y.max(0.0));
             });
 
             let _ = window.add_event_listener_with_callback("scroll", closure.as_ref().unchecked_ref());
@@ -64,8 +50,6 @@ pub fn Navbar() -> Element {
     let mut menu_open = use_signal(|| false);
 
     rsx! {
-        document::Link { rel: "stylesheet", href: NAVBAR_CSS }
-
         if menu_open() {
             div { class: "nav-backdrop", onclick: move |_| menu_open.set(false) }
         }
@@ -74,7 +58,6 @@ pub fn Navbar() -> Element {
             div { class: "nav-brand",
                 Link { to: Route::Home {}, "Gitan Elyon" }
             }
-            // Hamburger button for mobile
             button {
                 class: if menu_open() { "hamburger open" } else { "hamburger" },
                 onclick: move |_| menu_open.set(!menu_open()),

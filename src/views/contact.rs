@@ -1,24 +1,5 @@
+use crate::views::home::{FormData, FormStatus};
 use dioxus::prelude::*;
-use serde::Serialize;
-
-const CONTACT_CSS: Asset = asset!("/assets/styling/contact.css");
-
-// Define the different states our form can be in
-#[derive(Clone, PartialEq)]
-enum FormStatus {
-    Idle,
-    Submitting,
-    Success,
-    Error(String),
-}
-
-// A struct to hold our form data, which we can serialize to JSON
-#[derive(Clone, Default, Serialize)]
-struct FormData {
-    name: String,
-    email: String,
-    message: String,
-}
 
 #[component]
 pub fn Contact() -> Element {
@@ -27,99 +8,78 @@ pub fn Contact() -> Element {
 
     let handle_submit = move |evt: FormEvent| {
         evt.prevent_default();
-        // Set the status to Submitting to show loading feedback
         status.set(FormStatus::Submitting);
-
-        // Spawn an async task to send the data
         spawn(async move {
-            let formspree_url = "https://formspree.io/f/mldnapzn"; // Replace with your Formspree ID
-
             let client = reqwest::Client::new();
             let response = client
-                .post(formspree_url)
-                .header("Accept", "application/json") // Important: This tells Formspree to send a JSON response instead of redirecting
+                .post("https://formspree.io/f/mldnapzn")
+                .header("Accept", "application/json")
                 .json(&form_data.read().clone())
                 .send()
                 .await;
-
             match response {
                 Ok(res) if res.status().is_success() => {
                     status.set(FormStatus::Success);
-                    form_data.set(FormData::default()); // Clear the form on success
+                    form_data.set(FormData::default());
                 }
                 Ok(res) => {
-                    let error_text = res
-                        .text()
-                        .await
-                        .unwrap_or_else(|_| "An unknown error occurred.".to_string());
-                    status.set(FormStatus::Error(format!(
-                        "Failed to send message: {}",
-                        error_text
-                    )));
+                    let t = res.text().await.unwrap_or_else(|_| "Unknown error".into());
+                    status.set(FormStatus::Error(format!("Failed: {t}")));
                 }
-                Err(err) => {
-                    status.set(FormStatus::Error(format!("Network error: {}", err)));
-                }
+                Err(e) => status.set(FormStatus::Error(format!("Network error: {e}"))),
             }
         });
     };
 
     rsx! {
-        document::Link { rel: "stylesheet", href: CONTACT_CSS }
-        section {
-            id: "contact",
-            div {
-                class: "container",
-                h1 { "Get In Touch" }
-                div {
-                    class: "contact-content",
-                    div {
-                        class: "contact-info",
-                        // ... your existing contact info ...
+        section { id: "contact",
+            div { class: "container",
+                h1 { class: "page-title", "Get In Touch" }
+                div { class: "contact-content",
+                    div { class: "contact-info",
                         h2 { "Let's Connect" }
                         p {
-                            "I'm always interested in hearing about new opportunities,
-                            exciting projects, or just having a chat about technology."
+                            "I'm always interested in hearing about new opportunities, exciting projects, or just having a chat about technology."
                         }
-
-                        div {
-                            class: "contact-methods",
-                            div {
-                                class: "contact-method",
+                        div { class: "contact-methods",
+                            div { class: "contact-method",
                                 h3 { "Email" }
                                 p { "gitanelyon@gmail.com" }
                             }
-                            div {
-                                class: "contact-method",
+                            div { class: "contact-method",
                                 h3 { "Phone" }
                                 p { "(443)-224-8540" }
                             }
-                            div {
-                                class: "contact-method",
+                            div { class: "contact-method",
                                 h3 { "Location" }
                                 p { "Baltimore, Maryland, United States" }
                             }
                         }
-
-                        div {
-                            class: "social-links",
+                        div { class: "social-links",
                             h3 { "Follow Me" }
-                            div {
-                                class: "social-icons",
-                                a { href: "https://github.com/GitanElyon", target: "_blank", "GitHub" }
-                                a { href: "https://linkedin.com/in/gitaneylon", target: "_blank", "LinkedIn" }
-                                a { href: "https://instagram.com/gitanelyon", target: "_blank", "Instagram" }
+                            div { class: "social-icons",
+                                a {
+                                    href: "https://github.com/GitanElyon",
+                                    target: "_blank",
+                                    "GitHub"
+                                }
+                                a {
+                                    href: "https://linkedin.com/in/gitaneylon",
+                                    target: "_blank",
+                                    "LinkedIn"
+                                }
+                                a {
+                                    href: "https://instagram.com/gitanelyon",
+                                    target: "_blank",
+                                    "Instagram"
+                                }
                             }
                         }
                     }
-
-                    div {
-                        class: "contact-form-container",
-                        // Conditionally render based on the form status
+                    div { class: "contact-form-container",
                         match status() {
                             FormStatus::Success => rsx! {
-                                div {
-                                    class: "success-message",
+                                div { class: "success-message",
                                     h3 { "Message Sent!" }
                                     p { "Thanks for reaching out. I'll get back to you soon." }
                                     button {
@@ -129,11 +89,10 @@ pub fn Contact() -> Element {
                                     }
                                 }
                             },
-                            FormStatus::Error(error_msg) => rsx! {
-                                div {
-                                    class: "error-message",
+                            FormStatus::Error(msg) => rsx! {
+                                div { class: "error-message",
                                     h3 { "Something Went Wrong" }
-                                    p { "{error_msg}" }
+                                    p { "{msg}" }
                                     button {
                                         class: "btn btn-secondary",
                                         onclick: move |_| status.set(FormStatus::Idle),
@@ -141,13 +100,9 @@ pub fn Contact() -> Element {
                                     }
                                 }
                             },
-                            _ => rsx! { // Idle and Submitting states
-                                form {
-                                    class: "contact-form",
-                                    onsubmit: handle_submit,
-
-                                    div {
-                                        class: "form-group",
+                            _ => rsx! {
+                                form { class: "contact-form", onsubmit: handle_submit,
+                                    div { class: "form-group",
                                         label { r#for: "name", "Name" }
                                         input {
                                             r#type: "text",
@@ -158,9 +113,7 @@ pub fn Contact() -> Element {
                                             oninput: move |e| form_data.write().name = e.value(),
                                         }
                                     }
-
-                                    div {
-                                        class: "form-group",
+                                    div { class: "form-group",
                                         label { r#for: "email", "Email" }
                                         input {
                                             r#type: "email",
@@ -171,9 +124,7 @@ pub fn Contact() -> Element {
                                             oninput: move |e| form_data.write().email = e.value(),
                                         }
                                     }
-
-                                    div {
-                                        class: "form-group",
+                                    div { class: "form-group",
                                         label { r#for: "message", "Message" }
                                         textarea {
                                             id: "message",
@@ -184,7 +135,6 @@ pub fn Contact() -> Element {
                                             oninput: move |e| form_data.write().message = e.value(),
                                         }
                                     }
-
                                     button {
                                         r#type: "submit",
                                         class: "btn btn-primary",
@@ -196,7 +146,7 @@ pub fn Contact() -> Element {
                                         }
                                     }
                                 }
-                            }
+                            },
                         }
                     }
                 }

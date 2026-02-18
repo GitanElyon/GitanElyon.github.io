@@ -1,5 +1,3 @@
-use dioxus::prelude::*;
-
 #[derive(Clone, PartialEq)]
 pub struct Project {
     pub id: &'static str,
