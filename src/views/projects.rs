@@ -11,50 +11,35 @@ pub fn Projects() -> Element {
     let mut selected = use_signal(|| None::<String>);
 
     let featured: Vec<_> = projects.iter().filter(|p| p.is_featured).cloned().collect();
-    let non_featured: Vec<_> = projects.iter().filter(|p| !p.is_featured).cloned().collect();
+    let _non_featured: Vec<_> = projects.iter().filter(|p| !p.is_featured).cloned().collect();
 
     let featured_count = featured.len();
     let mut showcase_idx = use_signal(|| 0usize);
     let mut timer_pct = use_signal(|| 0.0f64);
     let mut paused = use_signal(|| false);
 
-    // Auto-rotate the showcase using web_sys setInterval
-    #[cfg(target_arch = "wasm32")]
-    {
-        use_effect(move || {
-            use wasm_bindgen::prelude::*;
-            use wasm_bindgen::JsCast;
-            use std::rc::Rc;
-            use std::cell::Cell;
-
-            let tick_count = Rc::new(Cell::new(0u64));
-            let total_ticks = (SHOWCASE_DURATION_MS / TICK_MS) as u64;
-
-            let closure = Closure::<dyn FnMut()>::new(move || {
-                if paused() {
-                    return;
-                }
-                let t = tick_count.get() + 1;
-                tick_count.set(t);
-                let pct = (t as f64 / total_ticks as f64) * 100.0;
-                timer_pct.set(pct.min(100.0));
-                if t >= total_ticks {
-                    tick_count.set(0);
-                    timer_pct.set(0.0);
-                    let next = (showcase_idx() + 1) % featured_count;
-                    showcase_idx.set(next);
-                }
-            });
-
-            if let Some(win) = web_sys::window() {
-                let _ = win.set_interval_with_callback_and_timeout_and_arguments_0(
-                    closure.as_ref().unchecked_ref(),
-                    TICK_MS as i32,
-                );
+    // Auto-rotate the showcase using a future (auto-cancels on unmount)
+    use_future(move || async move {
+        loop {
+            gloo_timers::future::TimeoutFuture::new(TICK_MS as u32).await;
+            
+            if paused() {
+                continue;
             }
-            closure.forget();
-        });
-    }
+
+            let total_ticks = (SHOWCASE_DURATION_MS / TICK_MS) as u64;
+            let current_pct = timer_pct();
+            let new_pct = current_pct + (100.0 / total_ticks as f64);
+
+            if new_pct >= 100.0 {
+                timer_pct.set(0.0);
+                let next = (showcase_idx() + 1) % featured_count;
+                showcase_idx.set(next);
+            } else {
+                timer_pct.set(new_pct);
+            }
+        }
+    });
 
     let open = |id: &'static str, glow: &'static str| {
         let s = id.to_string();

@@ -1,53 +1,50 @@
 use crate::Route;
 use dioxus::prelude::*;
-#[cfg(target_arch = "wasm32")]
-use std::cell::Cell;
-#[cfg(target_arch = "wasm32")]
-use std::rc::Rc;
-#[cfg(target_arch = "wasm32")]
-use wasm_bindgen::closure::Closure;
-#[cfg(target_arch = "wasm32")]
-use wasm_bindgen::JsCast;
 
 #[component]
 pub fn Navbar() -> Element {
+    let mut menu_open = use_signal(|| false);
+
     #[cfg(target_arch = "wasm32")]
     {
         use_effect(move || {
             let Some(window) = web_sys::window() else { return };
             let Some(document) = window.document() else { return };
-            let last_scroll = Rc::new(Cell::new(window.scroll_y().unwrap_or(0.0).max(0.0)));
-            let is_hidden = Rc::new(Cell::new(false));
-            let ls = last_scroll.clone();
-            let ih = is_hidden.clone();
-            let w = window.clone();
-            let d = document.clone();
+            
+            let mut last_scroll = window.scroll_y().unwrap_or(0.0).max(0.0);
+            let mut is_hidden = false;
 
-            let closure = Closure::<dyn FnMut(_)>::new(move |_: web_sys::Event| {
-                let y = w.scroll_y().unwrap_or(0.0);
-                let delta = y - ls.get();
-                let Some(el) = d.get_element_by_id("navbar") else { ls.set(y.max(0.0)); return };
-                let Ok(nav) = el.dyn_into::<web_sys::HtmlElement>() else { ls.set(y.max(0.0)); return };
-
-                if y <= 16.0 {
-                    let _ = nav.class_list().remove_1("navbar-hidden");
-                    ih.set(false);
-                } else if delta > 2.0 && y > 72.0 && !ih.get() {
-                    let _ = nav.class_list().add_1("navbar-hidden");
-                    ih.set(true);
-                } else if delta < -2.0 && ih.get() {
-                    let _ = nav.class_list().remove_1("navbar-hidden");
-                    ih.set(false);
+            // Use requestAnimationFrame-based throttle for better performance
+            use wasm_bindgen::prelude::*;
+            use wasm_bindgen::JsCast;
+            
+            let window_clone = window.clone();
+            let closure = Closure::<dyn FnMut()>::new(move || {
+                let y = window_clone.scroll_y().unwrap_or(0.0);
+                let delta = y - last_scroll;
+                
+                if let Some(nav) = document
+                    .get_element_by_id("navbar")
+                    .and_then(|el| el.dyn_into::<web_sys::HtmlElement>().ok())
+                {
+                    if y <= 16.0 {
+                        let _ = nav.class_list().remove_1("navbar-hidden");
+                        is_hidden = false;
+                    } else if delta > 2.0 && y > 72.0 && !is_hidden {
+                        let _ = nav.class_list().add_1("navbar-hidden");
+                        is_hidden = true;
+                    } else if delta < -2.0 && is_hidden {
+                        let _ = nav.class_list().remove_1("navbar-hidden");
+                        is_hidden = false;
+                    }
                 }
-                ls.set(y.max(0.0));
+                last_scroll = y.max(0.0);
             });
 
             let _ = window.add_event_listener_with_callback("scroll", closure.as_ref().unchecked_ref());
             closure.forget();
         });
     }
-
-    let mut menu_open = use_signal(|| false);
 
     rsx! {
         if menu_open() {

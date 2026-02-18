@@ -1,12 +1,4 @@
 /* Hex background plane --------------------------------------------------- */
-:root {
-    --hex-size: 36px;
-    --hex-gap: 6px;
-    --hex-color: #2a2a2a; /* dark gray */
-    --hex-stroke: #1f1f1f;
-    --hex-alpha: 1;
-}
-
 #hex-background {
     position: fixed;
     inset: 0;
@@ -14,47 +6,12 @@
     overflow: hidden;
     pointer-events: none;
     background: transparent;
-    /* Ensure it always fills the entire viewport */
     width: 100vw;
     height: 100vh;
-    min-width: 100%;
-    min-height: 100%;
 }
 
-#hex-background .hex {
-    position: absolute;
-    width: calc(var(--hex-size) * 2);
-    height: calc(var(--hex-size) * 2);
-    transform: translate(-50%, -50%);
-    /* Start from negative offsets so hex grid covers the top-left corner */
-    left: calc(-2 * var(--hex-size) + var(--col) * (var(--hex-size) * 1.5 + var(--hex-gap)));
-    top: calc(-2 * var(--hex-size) + var(--row) * (var(--hex-size) * 1.732 + var(--hex-gap)));
-}
-
-#hex-background .hex[data-parity="odd"] {
-    top: calc(
-        -2 * var(--hex-size)
-        + var(--row) * (var(--hex-size) * 1.732 + var(--hex-gap))
-        + (var(--hex-size) * 1.732 + var(--hex-gap)) * 0.5
-    );
-}
-
-#hex-background .hex::before {
-    content: "";
+#hex-background svg {
     display: block;
     width: 100%;
     height: 100%;
-    background: #0c0c0c;
-    clip-path: polygon(25% 6.6987%, 75% 6.6987%, 100% 50%, 75% 93.3013%, 25% 93.3013%, 0% 50%);
-    border: 1px solid var(--hex-stroke);
-    border-radius: 2px;
-    box-sizing: border-box;
-    filter: drop-shadow(0 0 2px rgba(0,0,0,0.2));
-}
-
-@media (max-width: 768px) {
-    :root { --hex-size: 20px; --hex-gap: 4px; }
-}
-@media (max-width: 480px) {
-    :root { --hex-size: 16px; --hex-gap: 3px; }
 }
