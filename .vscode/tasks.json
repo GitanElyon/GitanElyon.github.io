@@ -1,0 +1,19 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "dx clean build",
+			"type": "shell",
+			"command": "dx",
+			"args": [
+				"clean",
+				"build"
+			],
+			"isBackground": true,
+			"problemMatcher": [
+				"$rustc"
+			],
+			"group": "build"
+		}
+	]
+}

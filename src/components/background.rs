@@ -18,20 +18,20 @@ fn generate_hex_coords(rows: usize, cols: usize) -> Vec<Vec<HexCoord>> {
 
 #[component]
 pub fn Background() -> Element {
-    // Choose a grid large enough to fill the viewport; CSS will clip overflow.
-    // Later we can compute this responsively from the viewport size.
-    let rows = 24usize;
-    let cols = 48usize;
+    // Use a generous grid that fills the viewport even on mobile with smaller hex sizes.
+    // At --hex-size: 16px on mobile, each hex column spans ~35px, so 60 cols covers ~2100px.
+    // Each hex row spans ~31px, so 40 rows covers ~1240px – enough for most viewports.
+    let rows = 40usize;
+    let cols = 60usize;
     let grid = generate_hex_coords(rows, cols);
 
     rsx! {
         // Fixed, full-viewport container for the background
-        div {
-            id: "hex-background",
+        div { id: "hex-background",
             // Render one hex per grid cell. Store row/col as CSS variables.
             // For flat-top hexes, we offset ODD COLUMNS vertically in CSS for honeycomb interlock.
-            for (r, row) in grid.iter().enumerate() {
-                for (c, _) in row.iter().enumerate() {
+            for (r , row) in grid.iter().enumerate() {
+                for (c , _) in row.iter().enumerate() {
                     div {
                         class: "hex",
                         "data-parity": if c % 2 == 0 { "even" } else { "odd" },
