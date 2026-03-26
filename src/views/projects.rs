@@ -24,6 +24,25 @@ pub fn Projects() -> Element {
             gloo_timers::future::TimeoutFuture::new(TICK_MS as u32).await;
             
             if paused() {
+                if selected().is_some() {
+                    #[cfg(target_arch = "wasm32")]
+                    {
+                        if let Some(win) = web_sys::window() {
+                            let h = win.inner_height().unwrap().as_f64().unwrap();
+                            if let Some(doc) = win.document() {
+                                if let Some(el) = doc.query_selector(".showcase-wrapper").ok().flatten() {
+                                    let rect = el.get_bounding_client_rect();
+                                    if rect.bottom() < 0.0 || rect.top() > h {
+                                        selected.set(None);
+                                        paused.set(false);
+                                        timer_pct.set(0.0);
+                                        clear_theme_lock();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
                 continue;
             }
 
@@ -49,21 +68,10 @@ pub fn Projects() -> Element {
             paused.set(true);
             timer_pct.set(0.0);
             set_theme_lock(hex_to_hue(&color));
-            // Scroll to showcase
-            #[cfg(target_arch = "wasm32")]
-            {
-                if let Some(win) = web_sys::window() {
-                    if let Some(doc) = win.document() {
-                        if let Some(el) = doc.query_selector(".showcase-wrapper").ok().flatten() {
-                            el.scroll_into_view();
-                        }
-                    }
-                }
-            }
         }
     };
 
-    // Determine current showcase project — if a tile was clicked and it's a non-featured project,
+    // Determine current showcase project
     // show it in the showcase; otherwise show the auto-rotating featured project.
     let showcase_project = if let Some(ref sel_id) = selected() {
         projects.iter().find(|p| p.id == *sel_id).cloned()
@@ -106,13 +114,8 @@ pub fn Projects() -> Element {
                                         }
                                     }
                                     h3 { "{project.name}" }
-                                    // Show detailed_description when a project is selected, otherwise the short description
-                                    if is_selected {
-                                        for para in &project.detailed_description {
-                                            p { class: "detail", "{para}" }
-                                        }
-                                    } else {
-                                        p { "{project.description}" }
+                                    for para in &project.detailed_description {
+                                        p { class: "detail", "{para}" }
                                     }
                                     div { class: "tags",
                                         for tech in &project.technologies {

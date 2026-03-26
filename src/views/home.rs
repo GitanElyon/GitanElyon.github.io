@@ -142,6 +142,45 @@ pub fn Home() -> Element {
 
     let featured: Vec<_> = projects.iter().filter(|p| p.is_featured).collect();
 
+    use_future(move || async move {
+        loop {
+            #[cfg(target_arch = "wasm32")]
+            {
+                gloo_timers::future::TimeoutFuture::new(200).await;
+                if let Some(win) = web_sys::window() {
+                    let h = win.inner_height().unwrap().as_f64().unwrap();
+                    if let Some(doc) = win.document() {
+                        if let Some(el) = doc.query_selector(".expanded").ok().flatten() {
+                            let rect = el.get_bounding_client_rect();
+                            if rect.bottom() < 0.0 || rect.top() > h {
+                                expanded_project.set(None);
+                                clear_theme_lock();
+                            }
+                        }
+                        if let Some(el) = doc.query_selector(".lang-row.active").ok().flatten() {
+                            let rect = el.get_bounding_client_rect();
+                            if rect.bottom() < 0.0 || rect.top() > h {
+                                expanded_lang.set(None);
+                                clear_theme_lock();
+                            }
+                        }
+                        if let Some(el) = doc.query_selector(".skill-icon.active").ok().flatten() {
+                            let rect = el.get_bounding_client_rect();
+                            if rect.bottom() < 0.0 || rect.top() > h {
+                                selected_skill.set(None);
+                                clear_theme_lock();
+                            }
+                        }
+                    }
+                }
+            }
+            #[cfg(not(target_arch = "wasm32"))]
+            {
+                gloo_timers::future::TimeoutFuture::new(200).await;
+            }
+        }
+    });
+
     let handle_submit = move |evt: FormEvent| {
         evt.prevent_default();
         form_status.set(FormStatus::Submitting);
@@ -425,7 +464,9 @@ pub fn Home() -> Element {
                                     if is_expanded {
                                         div { class: "project-content-full",
                                             h3 { "{project.name}" }
-                                            p { "{project.description}" }
+                                            for para in &project.detailed_description {
+                                                p { "{para}" }
+                                            }
                                             div { class: "tags",
                                                 for tech in &project.technologies {
                                                     span { "{tech}" }
@@ -538,7 +579,7 @@ pub fn Home() -> Element {
                                     "GitHub"
                                 }
                                 a {
-                                    href: "https://linkedin.com/in/gitanmb",
+                                    href: "https://www.linkedin.com/in/gitanelyon/",
                                     target: "_blank",
                                     "LinkedIn"
                                 }

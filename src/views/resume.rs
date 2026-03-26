@@ -1,102 +1,209 @@
+use crate::data::resume::{fetch_resume_data, ResumeData, ResumeEducation, ResumeEntry, ResumeSkillCategory};
 use dioxus::prelude::*;
+
+fn trigger_print() {
+    #[cfg(target_arch = "wasm32")]
+    {
+        let script = r#"
+            (function() {
+                const btn = document.activeElement;
+                const oldText = btn && btn.tagName === 'BUTTON' ? btn.innerText : null;
+                if(oldText) btn.innerText = "Preparing PDF...";
+                
+                fetch('https://gitanelyon.dev/resume/')
+                    .then(res => res.text())
+                    .then(html => {
+                        const iframe = document.createElement('iframe');
+                        iframe.style.position = 'fixed';
+                        iframe.style.right = '0';
+                        iframe.style.bottom = '0';
+                        iframe.style.width = '816px';
+                        iframe.style.height = '1056px';
+                        iframe.style.opacity = '0';
+                        iframe.style.pointerEvents = 'none';
+                        document.body.appendChild(iframe);
+                        
+                        let doc = iframe.contentWindow.document;
+                        let newHtml = html.replace('<head>', '<head><base href="https://gitanelyon.dev/resume/">');
+                        
+                        newHtml = newHtml.replace('</body>', `
+                            <script>
+                                window.addEventListener('load', () => {
+                                    setTimeout(() => {
+                                        const b = document.querySelector(".download-btn");
+                                        if (b) b.click();
+                                    }, 800);
+                                });
+                            </script>
+                        </body>`);
+                        
+                        doc.open();
+                        doc.write(newHtml);
+                        doc.close();
+                        
+                        setTimeout(() => {
+                            if(oldText) btn.innerText = oldText;
+                            setTimeout(() => iframe.remove(), 10000);
+                        }, 2500);
+                    })
+                    .catch(e => {
+                        console.error('PDF fetch error:', e);
+                        window.open('https://gitanelyon.dev/resume/', '_blank');
+                        if(oldText) btn.innerText = oldText;
+                    });
+            })();
+        "#;
+        let _ = js_sys::eval(script);
+    }
+}
+
+fn render_bullets(entry: &ResumeEntry) -> Element {
+    rsx! {
+        ul {
+            for bullet in &entry.bullets {
+                li { "{bullet}" }
+            }
+        }
+    }
+}
+
+fn render_skill_category(category: &ResumeSkillCategory) -> Element {
+    rsx! {
+        div { class: "skill-category",
+            h4 { "{category.title}" }
+            p { "{category.skills.join(\", \")}" }
+        }
+    }
+}
+
+fn render_education_item(item: &ResumeEducation) -> Element {
+    rsx! {
+        div { class: "resume-item",
+            h3 { "{item.institution}" }
+            p { class: "company", "{item.detail}" }
+        }
+    }
+}
+
+fn render_entry(entry: &ResumeEntry) -> Element {
+    rsx! {
+        div { class: "resume-item",
+            h3 { "{entry.title}" }
+            p { class: "meta", "{entry.meta}" }
+            {render_bullets(entry)}
+        }
+    }
+}
 
 #[component]
 pub fn Resume() -> Element {
+    let mut resume = use_signal(|| None::<Result<ResumeData, String>>);
+
+    use_future(move || async move {
+        let result = fetch_resume_data().await;
+        resume.set(Some(result));
+    });
+
+    let on_download = move |_| trigger_print();
+
     rsx! {
         section { id: "resume",
             div { class: "container",
                 h1 { class: "page-title", "Resume" }
-                div { class: "resume-content",
-                    div { class: "resume-section",
-                        h2 { "Gitan Elyon Mandell-Balogh" }
-                        p { class: "resume-title", "Software Engineer & Full-Stack Developer" }
-                        p { class: "resume-contact",
-                            "Email: gitanelyon@gmail.com | Phone: (443) 224-8540 | Location: Pikesville Baltimore"
-                        }
-                    }
-                    div { class: "resume-section",
-                        h2 { "Professional Experience" }
-                        div { class: "resume-item",
-                            h3 { "Full Stack Developer" }
-                            p { class: "company", "NexSys | May 2025 - Present" }
-                            ul {
-                                li { "Built responsive web applications using Rust, Tauri and Dioxus" }
-                                li { "Collaborated with cross-functional teams in Agile environment" }
-                                li { "Implemented CI/CD pipelines and automated testing" }
+                match resume().as_ref() {
+                    Some(Ok(data)) => rsx! {
+                        div { class: "resume-content",
+                            div { class: "resume-section resume-header",
+                                h1 { "{data.name}" }
+                                h2 { "{data.subtitle}" }
+                                p { class: "resume-title", "{data.title}" }
                             }
-                        }
-                        div { class: "resume-item",
-                            h3 { "Software Engineer" }
-                            p { class: "company", "Freelancing | 2022 - Present" }
-                            ul {
-                                li { "Built lightweight applications using Javascript and Rust." }
-                                li { "Worked as a solo developer on a wide varity of tasks" }
-                                li { "Discovered problems and solutions for problems in everyday life" }
+
+                            div { class: "resume-section",
+                                h2 { "Summary" }
+                                p { "{data.summary}" }
                             }
-                        }
-                        div { class: "resume-item",
-                            h3 { "Backend Infrastructure Engineer" }
-                            p { class: "company", "Mind Over Machines | May 2024 - September 2024" }
-                            ul {
-                                li { "Optimized digital applications and systems for clients" }
-                                li { "Worked with engineers of all levels in a fast paced enviroment" }
-                                li { "Implemented systems to accelerate technology development" }
-                            }
-                        }
-                        div { class: "resume-item",
-                            h3 { "Backend Engineer" }
-                            p { class: "company", "Gulp Data | May 2023 - September 2023" }
-                            ul {
-                                li { "Developed and maintained website backend using python" }
-                                li { "Taught by and worked with senior software engineers" }
-                                li { "Improved QA page by using AI to searching alorithms" }
-                            }
-                        }
-                    }
-                    div { class: "resume-section",
-                        h2 { "Education" }
-                        div { class: "resume-item",
-                            h3 { "Bachelor of Engineering in Computer Engineering" }
-                            p { class: "company", "University of Maryland | 2024 - Current" }
-                            p {
-                                "Relevant Coursework: Data Structures, Algorithms, Software Engineering, Database Systems"
-                            }
-                        }
-                    }
-                    div { class: "resume-section",
-                        h2 { "Technical Skills" }
-                        div { class: "skills-categories",
-                            div { class: "skill-category",
-                                h4 { "Programming Languages" }
-                                p {
-                                    "Rust, Go, Python, JavaScript, TypeScript, Java, Lua, C/C++, C#, HTML/CSS"
+
+                            div { class: "resume-section",
+                                h2 { "Professional Experience" }
+                                for entry in &data.experience {
+                                    {render_entry(entry)}
                                 }
                             }
-                            div { class: "skill-category",
-                                h4 { "Frameworks & Libraries" }
-                                p { "Node.js, Svelte, Dioxus, Vue, Bun.js, Electron, Tauri" }
+
+                            div { class: "resume-section",
+                                h2 { "Technical Projects" }
+                                for entry in &data.projects {
+                                    {render_entry(entry)}
+                                }
                             }
-                            div { class: "skill-category",
-                                h4 { "Databases & Search" }
-                                p { "PostgreSQL, Solr, SurrealDB, SEO" }
+
+                            div { class: "resume-section",
+                                h2 { "Education" }
+                                for item in &data.education {
+                                    {render_education_item(item)}
+                                }
                             }
-                            div { class: "skill-category",
-                                h4 { "Tools & Systems" }
-                                p {
-                                    "Linux, Nix, Git, Adobe Suite, IDA Pro, Ghidra, CI/CD, Agile Methodologies"
+
+                            div { class: "resume-section",
+                                h2 { "Technical Skills" }
+                                div { class: "skills-categories",
+                                    for category in &data.skills {
+                                        {render_skill_category(category)}
+                                    }
+                                }
+                            }
+
+                            div { class: "resume-section",
+                                h2 { "Contact" }
+                                div { class: "contact-grid",
+                                    for item in &data.contact {
+                                        div { class: "contact-method",
+                                            h4 { "{item.label}" }
+                                            if let Some(href) = &item.href {
+                                                a {
+                                                    href: "{href}",
+                                                    target: if href.starts_with("http") { "_blank" } else { "_self" },
+                                                    "{item.value}"
+                                                }
+                                            } else {
+                                                p { "{item.value}" }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            div { class: "resume-actions",
+                                button { class: "btn btn-primary", onclick: on_download, "Download PDF Resume" }
+                                a {
+                                    href: "https://gitanelyon.dev/resume/",
+                                    target: "_blank",
+                                    class: "btn btn-secondary",
+                                    "Professional Resume ↗"
                                 }
                             }
                         }
-                    }
-                    div { class: "resume-actions",
-                        a { href: "#", class: "btn btn-primary", "Download PDF Resume" }
-                        a {
-                            href: "https://gitanelyon.github.io/resume",
-                            target: "_blank",
-                            class: "btn btn-secondary",
-                            "Professional Resume ↗"
+                    },
+                    Some(Err(err)) => rsx! {
+                        div { class: "resume-content",
+                            p { class: "resume-contact", "Unable to load the live resume: {err}" }
+                            div { class: "resume-actions",
+                                button { class: "btn btn-primary", onclick: on_download, "Download PDF Resume" }
+                                a {
+                                    href: "https://gitanelyon.dev/resume/",
+                                    target: "_blank",
+                                    class: "btn btn-secondary",
+                                    "Professional Resume ↗"
+                                }
+                            }
                         }
-                    }
+                    },
+                    None => rsx! {
+                        div { class: "resume-content",
+                            p { class: "resume-contact", "Loading live resume..." }
+                        }
+                    },
                 }
             }
         }

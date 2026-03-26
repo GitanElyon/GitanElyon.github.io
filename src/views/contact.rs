@@ -68,7 +68,7 @@ pub fn Contact() -> Element {
                                     "GitHub"
                                 }
                                 a {
-                                    href: "https://linkedin.com/in/gitanmb",
+                                    href: "https://www.linkedin.com/in/gitanelyon/",
                                     target: "_blank",
                                     "LinkedIn"
                                 }
