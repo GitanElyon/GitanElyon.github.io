@@ -33,6 +33,7 @@ const FIGMA_ICON: Asset = asset!("/icons/tools/figma.svg");
 const POSTGRES_ICON: Asset = asset!("/icons/data/postgresql.svg");
 const SOLR_ICON: Asset = asset!("/icons/data/apachesolr.svg");
 const SURREALDB_ICON: Asset = asset!("/icons/data/surrealdb.svg");
+const CLOUDFLARE_ICON: Asset = asset!("/icons/data/cloudflare.svg");
 
 #[derive(Clone, PartialEq)]
 pub struct Skill {
@@ -57,7 +58,7 @@ pub fn get_skill_sections() -> Vec<(&'static str, Vec<Skill>)> {
         (
             "Languages",
             vec![
-                Skill { name: "Rust", icon: RUST_ICON, hours: 300, projects: vec!["Minos", "Portfolio", "Blackjack AI", "Suilend Liquidator", "Flare"] },
+                Skill { name: "Rust", icon: RUST_ICON, hours: 300, projects: vec!["Minos", "Portfolio", "Blackjack AI", "Suilend Liquidator", "qst"] },
                 Skill { name: "Go", icon: GO_ICON, hours: 100, projects: vec!["Backend APIs", "Microservices"] },
                 Skill { name: "Python", icon: PYTHON_ICON, hours: 150, projects: vec!["ML Models", "Data Analysis", "Automation"] },
                 Skill { name: "JS/TS", icon: JS_ICON, hours: 250, projects: vec!["Web Apps", "Node Services", "Full Stack Apps", "Type-safe APIs"] },
@@ -98,6 +99,7 @@ pub fn get_skill_sections() -> Vec<(&'static str, Vec<Skill>)> {
                 Skill { name: "PostgreSQL", icon: POSTGRES_ICON, hours: 50, projects: vec!["Relational DBs"] },
                 Skill { name: "Solr", icon: SOLR_ICON, hours: 30, projects: vec!["Search Engines"] },
                 Skill { name: "SurrealDB", icon: SURREALDB_ICON, hours: 20, projects: vec!["Modern DBs"] },
+                Skill { name: "Cloudflare", icon: CLOUDFLARE_ICON, hours: 30, projects: vec!["Arcill"] },
             ],
         ),
     ]
@@ -109,7 +111,7 @@ pub fn get_about_languages() -> Vec<LanguageAbout> {
             name: "Rust",
             brief: "Memory-safe and performant",
             long: "Rust is my go-to language for building memory-safe, high-performance applications. Rust often becomes the core of my projects thanks to its reliability and speed.",
-            years: "~1.5 years",
+            years: "~2 years",
             tools: vec!["Tauri", "Dioxus", "Suilend"],
             color: "#DEA584",
         },
@@ -117,7 +119,7 @@ pub fn get_about_languages() -> Vec<LanguageAbout> {
             name: "Go",
             brief: "Simple, fast and reliable",
             long: "Go is my choice for building scalable backend services with simplicity and efficiency.",
-            years: "~1 year",
+            years: "~1.5 year",
             tools: vec!["Microservices", "REST", "gRPC"],
             color: "#00ADD8",
         },
@@ -125,7 +127,7 @@ pub fn get_about_languages() -> Vec<LanguageAbout> {
             name: "Python",
             brief: "Versatile and powerful",
             long: "Python is my tool for prototyping, scripting, and automating anything I need done quickly.",
-            years: "~4 years",
+            years: "~5 years",
             tools: vec!["Pandas", "FastAPI", "NumPy"],
             color: "#3776AB",
         },
@@ -133,7 +135,7 @@ pub fn get_about_languages() -> Vec<LanguageAbout> {
             name: "JavaScript",
             brief: "Dynamic and flexible",
             long: "JavaScript isn't my favorite stack to write in, but if I can dream it, JS can make it happen.",
-            years: "~2.5 years",
+            years: "~3.5 years",
             tools: vec!["Node", "Vue", "Svelte"],
             color: "#F7DF1E",
         },

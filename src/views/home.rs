@@ -118,6 +118,7 @@ fn skill_color(name: &str) -> &'static str {
         "PostgreSQL" => "#4169E1",
         "Solr" => "#D9411E",
         "SurrealDB" => "#FF00A0",
+        "Cloudflare" => "#F38020",
         _ => "#888888",
     }
 }
@@ -513,8 +514,15 @@ pub fn Home() -> Element {
             div { class: "container",
                 div { class: "timeline",
                     div { class: "timeline-item",
+                        h3 { "Systems Security Engineer" }
+                        p { class: "meta", "Ridgeback | April 2026 – Present" }
+                        p {
+                            "Utilized Rust for systems-level performance and safety in tandem with Tauri and cloud architecture to prevent cyber attacks."
+                        }
+                    }
+                    div { class: "timeline-item",
                         h3 { "Full Stack Developer" }
-                        p { class: "meta", "NexSys | May 2025 – Present" }
+                        p { class: "meta", "NexSys | May 2025 – October 2025" }
                         p {
                             "Built responsive web applications using Rust, Tauri and Dioxus. Collaborated with cross‑functional teams in an Agile environment."
                         }
