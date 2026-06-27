@@ -563,7 +563,7 @@ pub fn Home() -> Element {
                         div { class: "contact-methods",
                             div { class: "contact-method",
                                 h4 { "Name" }
-                                p { "Gitan /ʒitān/ Elyon Mandell-Balogh" }
+                                p { "Gitan Elyon Mandell-Balogh" }
                             }
                             div { class: "contact-method",
                                 h4 { "Email" }
