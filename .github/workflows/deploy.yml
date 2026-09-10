@@ -3,40 +3,86 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [ main ]
+  pull_request:
 
 permissions:
   contents: read
   pages: write
   id-token: write
 
+env:
+  # Must match `dx build` output for this package name.
+  PUB_DIR: ./target/dx/gitanelyon-github-io/release/web/public
+
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        components: rustfmt, clippy
+
+    - name: Cache Rust dependencies
+      uses: Swatinem/rust-cache@v2
+
+    - name: Check formatting
+      run: cargo fmt --check
+
+    - name: Clippy
+      run: cargo clippy --all-targets -- -D warnings
+
+    - name: Tests
+      run: cargo test
+
   build-and-deploy:
+    needs: check
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-    - uses: actions/checkout@v3
-    
+    - uses: actions/checkout@v4
+
     - name: Install Rust
       uses: dtolnay/rust-toolchain@stable
       with:
         targets: wasm32-unknown-unknown
-    
+
+    - name: Cache Rust dependencies
+      uses: Swatinem/rust-cache@v2
+      with:
+        # Also cache the Dioxus CLI binary install.
+        shared-key: dx-cli
+
     - name: Install Dioxus CLI
-      run: cargo install dioxus-cli
-    
+      run: |
+        if ! command -v dx >/dev/null 2>&1; then
+          cargo install dioxus-cli --version 0.7 --locked
+        fi
+
+    - name: Sync profile data
+      run: ./scripts/sync-profile.sh
+
     - name: Build
       run: dx build --platform web --release
-    
+
+    - name: SPA fallback for client-side routes
+      # GitHub Pages serves 404.html for unknown paths; a copy of the
+      # app shell lets deep links like /profile and /links resolve.
+      run: cp "$PUB_DIR/index.html" "$PUB_DIR/404.html"
+
     - name: Setup Pages
       uses: actions/configure-pages@v4
-      
+
     - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
+      uses: actions/upload-pages-artifact@v4
       with:
-        path: './target/dx/gitanelyon-github-io/release/web/public'
-        
+        path: ${{ env.PUB_DIR }}
+
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4

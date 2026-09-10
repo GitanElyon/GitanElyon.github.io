@@ -1,8 +1,5 @@
 use dioxus::prelude::*;
 
-#[cfg(target_arch = "wasm32")]
-const RESIZE_POLL_MS: u32 = 250;
-
 fn viewport_size() -> (f64, f64) {
     #[cfg(target_arch = "wasm32")]
     {
@@ -52,12 +49,18 @@ fn hex_path(size: f64) -> String {
     let h = r * 0.866025403784; // √3/2
     format!(
         "M {},{} L {},{} L {},{} L {},{} L {},{} L {},{} Z",
-        r, 0.0,
-        r / 2.0, h,
-        -r / 2.0, h,
-        -r, 0.0,
-        -r / 2.0, -h,
-        r / 2.0, -h
+        r,
+        0.0,
+        r / 2.0,
+        h,
+        -r / 2.0,
+        h,
+        -r,
+        0.0,
+        -r / 2.0,
+        -h,
+        r / 2.0,
+        -h
     )
 }
 
@@ -73,32 +76,50 @@ pub fn Background() -> Element {
 
     #[cfg(target_arch = "wasm32")]
     {
-        use_future(move || async move {
-            let mut last = viewport_size();
+        use std::sync::atomic::{AtomicBool, Ordering};
+        use wasm_bindgen::prelude::Closure;
+        use wasm_bindgen::JsCast;
 
-            loop {
-                gloo_timers::future::TimeoutFuture::new(RESIZE_POLL_MS).await;
+        // Installed on `window` (global): add exactly once.
+        static BG_RESIZE_LISTENER: AtomicBool = AtomicBool::new(false);
 
-                let current = viewport_size();
-                let width_changed = (current.0 - last.0).abs() > 1.0;
-                let height_changed = (current.1 - last.1).abs() > 1.0;
-
-                if width_changed || height_changed {
-                    last = current;
-                    let (size, gap) = hex_metrics(current.0);
-                    let (rows, cols) = compute_grid_size(current.0, current.1, size, gap);
+        use_effect(move || {
+            if BG_RESIZE_LISTENER.swap(true, Ordering::SeqCst) {
+                return;
+            }
+            let Some(win) = web_sys::window() else {
+                return;
+            };
+            let closure = Closure::<dyn FnMut()>::new(move || {
+                let (w, h) = viewport_size();
+                let (size, gap) = hex_metrics(w);
+                let (rows, cols) = compute_grid_size(w, h, size, gap);
+                if dimensions() != (size, gap, rows, cols) {
                     dimensions.set((size, gap, rows, cols));
                 }
-            }
+            });
+            let _ =
+                win.add_event_listener_with_callback("resize", closure.as_ref().unchecked_ref());
+            closure.forget();
         });
     }
 
-    let (hex_size, hex_gap, rows, cols) = dimensions();
-
-    let col_spacing = hex_size * 1.5 + hex_gap;
-    let row_spacing = hex_size * 1.732050808 + hex_gap;
-
-    let hex_d = hex_path(hex_size);
+    // Derived grid values are memoized so unrelated re-renders (e.g. route
+    // changes remounting parents) don't rebuild the hexagon path string.
+    let derived = use_memo(move || {
+        let (hex_size, hex_gap, rows, cols) = dimensions();
+        let col_spacing = hex_size * 1.5 + hex_gap;
+        let row_spacing = hex_size * 1.732050808 + hex_gap;
+        (
+            hex_size,
+            hex_path(hex_size),
+            col_spacing,
+            row_spacing,
+            rows,
+            cols,
+        )
+    });
+    let (hex_size, hex_d, col_spacing, row_spacing, rows, cols) = derived();
     let base_x = -2.0 * hex_size;
     let base_y = -2.0 * hex_size;
 

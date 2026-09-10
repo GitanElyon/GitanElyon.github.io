@@ -71,8 +71,29 @@
 
 /* ── Reset ────────────────────────────────────────────────────────────── */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-html, body { scrollbar-width: none; overscroll-behavior: none; }
-*::-webkit-scrollbar { width: 0 !important; height: 0 !important; }
+html, body { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.25) transparent; overscroll-behavior: none; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.22); border-radius: 4px; }
+*::-webkit-scrollbar-track { background: transparent; }
+
+::selection {
+  background: var(--c-accent-start);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--c-accent-start);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { animation: none; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 
 /* ── Body ─────────────────────────────────────────────────────────────── */
 body {
@@ -132,6 +153,7 @@ section {
   flex-direction: column;
   align-items: center;
   width: 100%;
+  scroll-margin-top: 90px;
 }
 
 /* ── Glass Panel ──────────────────────────────────────────────────────── */
@@ -222,11 +244,6 @@ section {
   background: rgba(255,255,255,0.08);
   color: var(--c-text-secondary);
   border: 1px solid var(--c-border);
-  transition: border-color var(--t-base), background var(--t-base);
-}
-.tags span:hover {
-  border-color: var(--c-accent-start);
-  background: rgba(255,255,255,0.12);
 }
 
 /* ── Shared link underline ────────────────────────────────────────────── */

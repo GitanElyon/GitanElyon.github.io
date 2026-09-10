@@ -1,0 +1,86 @@
+# Resume data - single source of truth.
+# index.html is generated from this file by build.sh. Do not edit index.html directly.
+# Formatting rules for the parser (see build.sh):
+#   - Quoted values may not contain double quotes, tabs, or newlines.
+#   - Inline records (jobs/projects/publications) must be one record per line.
+#   - List items (bullets, skills) must be one quoted string per line.
+
+[personal]
+first_name = "Gitan Elyon"
+last_name = "Mandell-Balogh"
+title = "Systems Engineer"
+
+[contact]
+website = "https://gitanelyon.dev"
+email = "gitanelyon@gmail.com"
+linkedin = "https://www.linkedin.com/in/gitanelyon/"
+github = "https://github.com/gitanelyon"
+phone = "443-224-8540"
+location = "Baltimore, MD"
+citizenship = "U.S. Citizen - Eligible for Security Clearance"
+
+[education]
+school = "University of Maryland"
+degree = "Bachelor of Science"
+major = "Information Science"
+minor = "Cyber Security" # not yet declared; omitted from rendered output until it is
+graduation = "Expected May 2028"
+
+[summary]
+summary = "Systems Engineer specializing in high-performance backend and security infrastructure using Rust and Go. Experienced in low-latency systems, LLM-driven search, and Nix-based reproducible build environments, delivering scalable solutions across startup and enterprise settings."
+
+[work]
+jobs = [
+    { company = "Ridgeback", title = "Systems Security Engineer", start_date = "2026-04", end_date = "Present", bullets = [
+        "Build Rust-based network security tooling on a Tauri and cloud architecture to detect and prevent infrastructure threats.",
+        "Author logic-based access-control constraints in Scryer Prolog, enabling verifiable authorization checks that eliminate classes of logic vulnerabilities.",
+        "Optimize Rust systems code for performance and memory safety in production security workloads."
+    ] },
+    { company = "NexSys", title = "Full Stack Developer", start_date = "2025-05", end_date = "2025-10", bullets = [
+        "Built high-performance desktop interfaces with Rust and Dioxus, delivering memory-safe, low-latency UIs for data-heavy workflows.",
+        "Led sprint demos and coordinated asynchronous Git/GitHub workflows for a remote-first engineering team.",
+        "Automated local builds and developer workflows with custom Lua scripts, cutting manual setup time and removing repetitive steps."
+    ] },
+    { company = "Freelancing", title = "Software Engineer", start_date = "2023-01", end_date = "Present", bullets = [
+        "Architected and deployed 10+ lightweight client applications in Go and Rust end to end, from requirements through deployment.",
+        "Built cross-platform tools with minimal resource footprint as a solo engineer, owning the full development lifecycle for each client.",
+        "Standardized builds with Nix, guaranteeing identical environments across development, testing, and production."
+    ] },
+    { company = "Mind Over Machines", title = "Infrastructure Engineer", start_date = "2024-05", end_date = "2024-09", bullets = [
+        "Profiled and resolved performance bottlenecks in enterprise applications, improving end-user response times.",
+        "Implemented automated CI/CD pipelines and system monitoring to speed reliable deployments.",
+        "Collaborated across levels in Agile teams to deliver infrastructure upgrades for the company."
+    ] },
+    { company = "Gulp Data", title = "Back End Intern", start_date = "2023-05", end_date = "2023-09", bullets = [
+        "Developed and maintained Python backends for data-intensive client applications, sustaining 99.9% uptime.",
+        "Integrated LLM-driven search into QA retrieval using Solr and PostgreSQL, improving answer accuracy and query speed.",
+        "Adopted senior-engineer-led best practices for code quality, security, and architectural design."
+    ] }
+]
+
+[projects] # not all projects, just the most relevant ones
+projects = [
+    { name = "Qst - Quick Script Tool", skills = ["Rust", "Linux", "CLI"], date = "2025-09", github = "https://github.com/gitanelyon/qst", bullets = [
+      "Architected an extensible CLI tool for Linux system management, centralizing fragmented workflows into one plugin-based interface.",
+      "Designed and documented a plugin API, enabling third-party developers to extend functionality safely.",
+      "Published on Github, crates.io, and the AUR, with hundreds of downloads and an active user community."
+      ] },
+    { name = "Suilend Liquidator", skills = ["Rust", "TypeScript", "Concurrency"], date = "2025-10", github = "private", bullets = [
+      "Rebuilt a latency-critical service from TypeScript to Rust, cutting execution latency and raising throughput under sustained load.",
+      "Designed concurrent systems for real-time interaction with on-chain smart contracts as part of a small team.",
+      "Optimized memory usage and concurrency patterns to maintain consistent performance under heavy load."
+      ] },
+]
+
+
+[skills]
+languages = ["Rust", "Go", "Python", "Java", "C/C++", "C#", "JS/TS"]
+frameworks = ["Node.js", "React", "Vue", "Svelte", "Django", "Tauri", "Dioxus"]
+data = ["PostgreSQL", "Supabase", "Solr", "Redis", "MongoDB"]
+tools = ["Linux", "Git", "Docker", "Nix", "CI/CD", "AWS", "Azure", "Cloudflare"]
+
+[other] # Certifications, publications, awards, etc.
+publications = [
+    { title = "Proximity Alert: Ipelets for Neighborhood Graphs and Clustering", role = "First author", publisher = "University of Maryland", date = "2026-03", link = "https://arxiv.org/abs/2603.27023", description = "Co-authored with Dr. David Mount and others." }
+]
+certifications = [] # none yet, but will add in the future

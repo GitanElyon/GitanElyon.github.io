@@ -1,5 +1,12 @@
 use crate::Route;
 use dioxus::prelude::*;
+#[cfg(target_arch = "wasm32")]
+use std::sync::atomic::{AtomicBool, Ordering};
+
+/// The scroll listener is attached to `window` (global), so it must only be
+/// added once no matter how often the Navbar re-renders or remounts.
+#[cfg(target_arch = "wasm32")]
+static NAV_SCROLL_LISTENER: AtomicBool = AtomicBool::new(false);
 
 #[component]
 pub fn Navbar() -> Element {
@@ -8,21 +15,29 @@ pub fn Navbar() -> Element {
     #[cfg(target_arch = "wasm32")]
     {
         use_effect(move || {
-            let Some(window) = web_sys::window() else { return };
-            let Some(document) = window.document() else { return };
-            
+            // Bail out if a previous mount already installed the listener.
+            if NAV_SCROLL_LISTENER.swap(true, Ordering::SeqCst) {
+                return;
+            }
+            let Some(window) = web_sys::window() else {
+                return;
+            };
+            let Some(document) = window.document() else {
+                return;
+            };
+
             let mut last_scroll = window.scroll_y().unwrap_or(0.0).max(0.0);
             let mut is_hidden = false;
 
             // Use requestAnimationFrame-based throttle for better performance
             use wasm_bindgen::prelude::*;
             use wasm_bindgen::JsCast;
-            
+
             let window_clone = window.clone();
             let closure = Closure::<dyn FnMut()>::new(move || {
                 let y = window_clone.scroll_y().unwrap_or(0.0);
                 let delta = y - last_scroll;
-                
+
                 if let Some(nav) = document
                     .get_element_by_id("navbar")
                     .and_then(|el| el.dyn_into::<web_sys::HtmlElement>().ok())
@@ -41,7 +56,8 @@ pub fn Navbar() -> Element {
                 last_scroll = y.max(0.0);
             });
 
-            let _ = window.add_event_listener_with_callback("scroll", closure.as_ref().unchecked_ref());
+            let _ =
+                window.add_event_listener_with_callback("scroll", closure.as_ref().unchecked_ref());
             closure.forget();
         });
     }
@@ -63,11 +79,18 @@ pub fn Navbar() -> Element {
                 class: if menu_open() { "hamburger open" } else { "hamburger" },
                 onclick: move |_| menu_open.set(!menu_open()),
                 "aria-label": "Toggle navigation menu",
+                "aria-expanded": "{menu_open()}",
+                "aria-controls": "nav-links",
+                onkeydown: move |e| {
+                    if e.key() == Key::Escape {
+                        menu_open.set(false);
+                    }
+                },
                 span { class: "hamburger-line" }
                 span { class: "hamburger-line" }
                 span { class: "hamburger-line" }
             }
-            div { class: if menu_open() { "nav-links open" } else { "nav-links" },
+            div { class: if menu_open() { "nav-links open" } else { "nav-links" }, id: "nav-links",
                 Link {
                     to: Route::Home {},
                     onclick: move |_| menu_open.set(false),
@@ -84,9 +107,9 @@ pub fn Navbar() -> Element {
                     "Projects"
                 }
                 Link {
-                    to: Route::Resume {},
+                    to: Route::Profile {},
                     onclick: move |_| menu_open.set(false),
-                    "Resume"
+                    "Profile"
                 }
                 Link {
                     to: Route::Contact {},

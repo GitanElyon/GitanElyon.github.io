@@ -3,7 +3,7 @@ use crate::views::home::{clear_theme_lock, hex_to_hue, set_theme_lock};
 use dioxus::prelude::*;
 
 const SHOWCASE_DURATION_MS: f64 = 8000.0; // 8 seconds per featured project
-const TICK_MS: f64 = 50.0;
+const TICK_MS: f64 = 250.0;
 
 #[component]
 pub fn Projects() -> Element {
@@ -11,7 +11,11 @@ pub fn Projects() -> Element {
     let mut selected = use_signal(|| None::<String>);
 
     let featured: Vec<_> = projects.iter().filter(|p| p.is_featured).cloned().collect();
-    let _non_featured: Vec<_> = projects.iter().filter(|p| !p.is_featured).cloned().collect();
+    let _non_featured: Vec<_> = projects
+        .iter()
+        .filter(|p| !p.is_featured)
+        .cloned()
+        .collect();
 
     let featured_count = featured.len();
     let mut showcase_idx = use_signal(|| 0usize);
@@ -22,7 +26,20 @@ pub fn Projects() -> Element {
     use_future(move || async move {
         loop {
             gloo_timers::future::TimeoutFuture::new(TICK_MS as u32).await;
-            
+
+            #[cfg(target_arch = "wasm32")]
+            {
+                // Don't burn cycles rotating a hidden tab.
+                if let Some(hidden) = web_sys::window()
+                    .and_then(|w| w.document())
+                    .map(|d| d.hidden())
+                {
+                    if hidden {
+                        continue;
+                    }
+                }
+            }
+
             if paused() {
                 if selected().is_some() {
                     #[cfg(target_arch = "wasm32")]
@@ -30,7 +47,9 @@ pub fn Projects() -> Element {
                         if let Some(win) = web_sys::window() {
                             let h = win.inner_height().unwrap().as_f64().unwrap();
                             if let Some(doc) = win.document() {
-                                if let Some(el) = doc.query_selector(".showcase-wrapper").ok().flatten() {
+                                if let Some(el) =
+                                    doc.query_selector(".showcase-wrapper").ok().flatten()
+                                {
                                     let rect = el.get_bounding_client_rect();
                                     if rect.bottom() < 0.0 || rect.top() > h {
                                         selected.set(None);
@@ -80,6 +99,7 @@ pub fn Projects() -> Element {
     };
 
     rsx! {
+        document::Title { "Projects — Gitan Elyon" }
         section { id: "projects",
             div { class: "container",
                 h1 { class: "page-title", "My Projects" }
@@ -127,6 +147,7 @@ pub fn Projects() -> Element {
                                             a {
                                                 href: "{url}",
                                                 target: "_blank",
+                                                rel: "noopener",
                                                 class: "link",
                                                 onclick: |e: Event<MouseData>| e.stop_propagation(),
                                                 "GitHub ↗"
@@ -136,6 +157,7 @@ pub fn Projects() -> Element {
                                             a {
                                                 href: "{url}",
                                                 target: "_blank",
+                                                rel: "noopener",
                                                 class: "link",
                                                 onclick: |e: Event<MouseData>| e.stop_propagation(),
                                                 "Live Demo ↗"

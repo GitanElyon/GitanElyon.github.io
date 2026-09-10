@@ -1,23 +1,8 @@
+use crate::components::ContactForm;
+use crate::data::profile::get_profile_data;
 use crate::data::projects::get_projects;
 use crate::data::skills::{get_about_languages, get_skill_sections};
 use dioxus::prelude::*;
-
-// ── Shared types (used by contact.rs) ────────────────────────────────────
-
-#[derive(Clone, Default, serde::Serialize)]
-pub struct FormData {
-    pub name: String,
-    pub email: String,
-    pub message: String,
-}
-
-#[derive(Clone, PartialEq)]
-pub enum FormStatus {
-    Idle,
-    Submitting,
-    Success,
-    Error(String),
-}
 
 // ── Theme helpers (minimal Rust, heavy CSS) ──────────────────────────────
 
@@ -123,7 +108,7 @@ fn skill_color(name: &str) -> &'static str {
     }
 }
 
-const HEADSHOT: Asset = asset!("/assets/profile.jpg");
+const HEADSHOT: Asset = asset!("/assets/profile.webp");
 
 // ── Home component ──────────────────────────────────────────────────────
 
@@ -132,22 +117,30 @@ pub fn Home() -> Element {
     let sections = get_skill_sections();
     let projects = get_projects();
     let languages = get_about_languages();
+    // Single source of truth: career timeline + contact details mirror the profile data.
+    let profile = get_profile_data();
+    let career = profile.experience.clone();
 
     let mut carousel_idx = use_signal(|| 0usize);
     let mut selected_skill = use_signal(|| None::<String>);
     let mut expanded_lang = use_signal(|| None::<String>);
     let mut expanded_project = use_signal(|| None::<String>);
 
-    let mut form_data = use_signal(FormData::default);
-    let mut form_status = use_signal(|| FormStatus::Idle);
-
     let featured: Vec<_> = projects.iter().filter(|p| p.is_featured).collect();
 
     use_future(move || async move {
         loop {
+            gloo_timers::future::TimeoutFuture::new(500).await;
+            // Skip all DOM work unless something is actually expanded —
+            // otherwise this would wake up and query the DOM forever.
+            if expanded_project().is_none()
+                && expanded_lang().is_none()
+                && selected_skill().is_none()
+            {
+                continue;
+            }
             #[cfg(target_arch = "wasm32")]
             {
-                gloo_timers::future::TimeoutFuture::new(200).await;
                 if let Some(win) = web_sys::window() {
                     let h = win.inner_height().unwrap().as_f64().unwrap();
                     if let Some(doc) = win.document() {
@@ -175,37 +168,10 @@ pub fn Home() -> Element {
                     }
                 }
             }
-            #[cfg(not(target_arch = "wasm32"))]
-            {
-                gloo_timers::future::TimeoutFuture::new(200).await;
-            }
+            // Non-wasm targets (SSR/tests): the sleep at the top of the loop
+            // is the whole body; there is no DOM to collapse-check.
         }
     });
-
-    let handle_submit = move |evt: FormEvent| {
-        evt.prevent_default();
-        form_status.set(FormStatus::Submitting);
-        spawn(async move {
-            let client = reqwest::Client::new();
-            let response = client
-                .post("https://formspree.io/f/mldnapzn")
-                .header("Accept", "application/json")
-                .json(&form_data.read().clone())
-                .send()
-                .await;
-            match response {
-                Ok(res) if res.status().is_success() => {
-                    form_status.set(FormStatus::Success);
-                    form_data.set(FormData::default());
-                }
-                Ok(res) => {
-                    let t = res.text().await.unwrap_or_else(|_| "Unknown error".into());
-                    form_status.set(FormStatus::Error(format!("Failed: {t}")));
-                }
-                Err(e) => form_status.set(FormStatus::Error(format!("Network error: {e}"))),
-            }
-        });
-    };
 
     // Toggle featured project and lock/unlock theme
     let toggle_project = |id: &'static str, glow: &'static str| {
@@ -223,6 +189,7 @@ pub fn Home() -> Element {
     };
 
     rsx! {
+        document::Title { "Gitan Elyon — Systems Engineer" }
         // ── Hero ─────────────────────────────────────────────────
         section { id: "hero",
             div { class: "hero-content",
@@ -235,7 +202,7 @@ pub fn Home() -> Element {
                             span { class: "name-line", "Elyon" }
                         }
                     }
-                    h2 { "Full Stack Developer & Software Engineer" }
+                    h2 { "Systems Engineer" }
                     p {
                         "I build high‑performance applications with modern tools. Passionate about solving real problems using cutting edge technologies."
                     }
@@ -245,7 +212,13 @@ pub fn Home() -> Element {
                     }
                 }
                 div { class: "hero-image",
-                    img { src: HEADSHOT, alt: "Gitan Elyon" }
+                    img {
+                        src: HEADSHOT,
+                        alt: "Portrait of Gitan Elyon",
+                        width: "560",
+                        height: "560",
+                        decoding: "async",
+                    }
                 }
             }
         }
@@ -259,23 +232,24 @@ pub fn Home() -> Element {
                     div { class: "glass",
                         h3 { "Who I Am" }
                         p {
-                            "A passionate software engineer focused on building fast, reliable and beautiful applications. From embedded systems to full‑stack web apps, I love turning ideas into real products."
+                            "A Systems Engineer building high-performance backend and security infrastructure with Rust and Go. Currently at Ridgeback Network Defence — previously NexSys, Mind Over Machines, and Gulp Data."
                         }
                     }
                     // Work card
                     div { class: "glass",
                         h3 { "What I Do" }
                         ul {
-                            li { "Full‑stack web applications" }
-                            li { "Systems programming & optimization" }
-                            li { "Desktop & cross‑platform apps" }
-                            li { "Open source contributions" }
+                            li { "Network security tooling & access-control systems" }
+                            li { "Low-latency backends & LLM-driven search" }
+                            li { "Cross-platform desktop apps (Tauri, Dioxus)" }
+                            li { "Reproducible builds & dev environments with Nix" }
+                            li { "Automation & CI/CD pipelines" }
+                            li { "Open source: Qst, Minos, Papyr" }
                         }
                     }
                     // Languages card
                     div { class: "glass",
                         h3 { "Languages" }
-                        h4 { class: "hint", "Click a language to see details" }
                         for lang in &languages {
                             div {
                                 class: if expanded_lang() == Some(lang.name.to_string()) { "lang-row active" } else { "lang-row" },
@@ -323,6 +297,7 @@ pub fn Home() -> Element {
         // ── Skills ───────────────────────────────────────────────
         section { id: "home-skills",
             h2 { class: "section-title", "Skills" }
+            p { class: "hint", "Hours are self-tracked estimates" }
             div { class: "carousel-wrapper",
                 {
                     let section = &sections[carousel_idx()];
@@ -371,7 +346,14 @@ pub fn Home() -> Element {
                                                                         }
                                                                     }
                                                                 },
-                                                                img { src: skill.icon, alt: "{skill.name}" }
+                                                                img {
+                                                                    src: skill.icon,
+                                                                    alt: "{skill.name} icon",
+                                                                    width: "48",
+                                                                    height: "48",
+                                                                    loading: "lazy",
+                                                                    decoding: "async",
+                                                                }
                                                             }
                                                         }
                                                         div {
@@ -478,6 +460,7 @@ pub fn Home() -> Element {
                                                     a {
                                                         href: "{url}",
                                                         target: "_blank",
+                                                        rel: "noopener",
                                                         class: "link",
                                                         onclick: |e: Event<MouseData>| e.stop_propagation(),
                                                         "GitHub ↗"
@@ -487,6 +470,7 @@ pub fn Home() -> Element {
                                                     a {
                                                         href: "{url}",
                                                         target: "_blank",
+                                                        rel: "noopener",
                                                         class: "link",
                                                         onclick: |e: Event<MouseData>| e.stop_propagation(),
                                                         "Live Demo ↗"
@@ -513,39 +497,13 @@ pub fn Home() -> Element {
             h2 { class: "section-title", "Career" }
             div { class: "container",
                 div { class: "timeline",
-                    div { class: "timeline-item",
-                        h3 { "Systems Security Engineer" }
-                        p { class: "meta", "Ridgeback | April 2026 – Present" }
-                        p {
-                            "Utilized Rust for systems-level performance and safety in tandem with Tauri and cloud architecture to prevent cyber attacks."
-                        }
-                    }
-                    div { class: "timeline-item",
-                        h3 { "Full Stack Developer" }
-                        p { class: "meta", "NexSys | May 2025 – October 2025" }
-                        p {
-                            "Built responsive web applications using Rust, Tauri and Dioxus. Collaborated with cross‑functional teams in an Agile environment."
-                        }
-                    }
-                    div { class: "timeline-item",
-                        h3 { "Software Engineer" }
-                        p { class: "meta", "Freelancing | 2022 – Present" }
-                        p {
-                            "Built lightweight applications using JavaScript and Rust. Worked as a solo developer on a wide variety of tasks for clients."
-                        }
-                    }
-                    div { class: "timeline-item",
-                        h3 { "Backend Infrastructure Engineer" }
-                        p { class: "meta", "Mind Over Machines | May 2024 – Sep 2024" }
-                        p {
-                            "Optimized digital applications and systems for clients. Implemented systems to accelerate technology development in a fast‑paced environment."
-                        }
-                    }
-                    div { class: "timeline-item",
-                        h3 { "Backend Engineer" }
-                        p { class: "meta", "Gulp Data | May 2023 – Sep 2023" }
-                        p {
-                            "Developed and maintained website backend using Python. Improved QA tooling with AI‑powered searching algorithms."
+                    for entry in &career {
+                        div { class: "timeline-item",
+                            h3 { "{entry.title}" }
+                            p { class: "meta", "{entry.meta}" }
+                            if let Some(first) = entry.bullets.first() {
+                                p { "{first}" }
+                            }
                         }
                     }
                 }
@@ -563,19 +521,17 @@ pub fn Home() -> Element {
                         div { class: "contact-methods",
                             div { class: "contact-method",
                                 h4 { "Name" }
-                                p { "Gitan Elyon Mandell-Balogh" }
+                                p { "{profile.full_name}" }
                             }
                             div { class: "contact-method",
                                 h4 { "Email" }
-                                p { "gitanelyon@gmail.com" }
-                            }
-                            div { class: "contact-method",
-                                h4 { "Phone" }
-                                p { "(443)-224-8540" }
+                                p {
+                                    a { href: "mailto:{profile.email}", "{profile.email}" }
+                                }
                             }
                             div { class: "contact-method",
                                 h4 { "Location" }
-                                p { "Baltimore, MD" }
+                                p { "{profile.location}" }
                             }
                         }
                         div { class: "social-links",
@@ -584,86 +540,20 @@ pub fn Home() -> Element {
                                 a {
                                     href: "https://github.com/GitanElyon",
                                     target: "_blank",
+                                    rel: "noopener me",
                                     "GitHub"
                                 }
                                 a {
                                     href: "https://www.linkedin.com/in/gitanelyon/",
                                     target: "_blank",
+                                    rel: "noopener me",
                                     "LinkedIn"
-                                }
-                                a {
-                                    href: "https://instagram.com/gitanelyon",
-                                    target: "_blank",
-                                    "Instagram"
                                 }
                             }
                         }
                     }
                     div { class: "glass",
-                        match form_status() {
-                            FormStatus::Success => rsx! {
-                                div { class: "success-message",
-                                    h3 { "Sent!" }
-                                    p { "Thanks for reaching out – I'll reply soon." }
-                                    button {
-                                        class: "btn btn-secondary",
-                                        onclick: move |_| form_status.set(FormStatus::Idle),
-                                        "Send Another"
-                                    }
-                                }
-                            },
-                            FormStatus::Error(ref msg) => rsx! {
-                                div { class: "error-message",
-                                    h3 { "Something Went Wrong" }
-                                    p { "{msg}" }
-                                    button {
-                                        class: "btn btn-secondary",
-                                        onclick: move |_| form_status.set(FormStatus::Idle),
-                                        "Try Again"
-                                    }
-                                }
-                            },
-                            _ => rsx! {
-                                form { onsubmit: handle_submit,
-                                    div { class: "form-group",
-                                        label { "Name" }
-                                        input {
-                                            r#type: "text",
-                                            required: true,
-                                            value: "{form_data.read().name}",
-                                            oninput: move |e| form_data.write().name = e.value(),
-                                        }
-                                    }
-                                    div { class: "form-group",
-                                        label { "Email" }
-                                        input {
-                                            r#type: "email",
-                                            required: true,
-                                            value: "{form_data.read().email}",
-                                            oninput: move |e| form_data.write().email = e.value(),
-                                        }
-                                    }
-                                    div { class: "form-group",
-                                        label { "Message" }
-                                        textarea {
-                                            required: true,
-                                            value: "{form_data.read().message}",
-                                            oninput: move |e| form_data.write().message = e.value(),
-                                        }
-                                    }
-                                    button {
-                                        class: "btn btn-primary",
-                                        r#type: "submit",
-                                        disabled: matches!(form_status(), FormStatus::Submitting),
-                                        if matches!(form_status(), FormStatus::Submitting) {
-                                            "Sending…"
-                                        } else {
-                                            "Send Message"
-                                        }
-                                    }
-                                }
-                            },
-                        }
+                        ContactForm {}
                     }
                 }
             }
