@@ -61,7 +61,7 @@ jobs:
     - name: Install Dioxus CLI
       run: |
         if ! command -v dx >/dev/null 2>&1; then
-          cargo install dioxus-cli --version 0.7 --locked
+          cargo install dioxus-cli --version ^0.7 --locked
         fi
 
     - name: Sync profile data
